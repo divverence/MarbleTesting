@@ -1,0 +1,7 @@
+assembly-versioning-scheme: MajorMinorPatchTag
+mode: ContinuousDeployment
+branches:
+  dev(elop)?(ment)?$:
+    tag: dev
+  releases?[/-]:
+    tag: rc
