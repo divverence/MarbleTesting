@@ -6,13 +6,23 @@ using System.Threading.Tasks;
 
 namespace Divverence.MarbleTesting
 {
-    public class MarbleTester
+    public class MarbleTest
     {
-        public MarbleTester(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward)
+        private readonly Func<TimeSpan, Task> _fastForward;
+
+        private readonly Func<Task> _waitForIdle;
+
+        protected List<ExpectedMarbles> ExpectedMarbleStrings = new List<ExpectedMarbles>();
+
+        protected List<InputMarbles> Inputs = new List<InputMarbles>();
+
+        public MarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward)
         {
             _waitForIdle = waitForIdle;
             _fastForward = fastForward;
         }
+
+        private Task SystemIdle => _waitForIdle();
 
         public async Task Run(TimeSpan? interval = null)
         {
@@ -36,20 +46,22 @@ namespace Divverence.MarbleTesting
 
         public void WhenDoing(string timeline, Action<string> whatToDo)
         {
-            var actions = ParseMarbles(timeline).SelectMany((tokens, t) => CreateInputMarbles(async token => whatToDo(token), tokens, t));
+            var actions =
+                ParseMarbles(timeline)
+                    .SelectMany((tokens, t) => CreateInputMarbles(async token => whatToDo(token), tokens, t));
             Inputs.Add(new InputMarbles(timeline, actions));
         }
-
-        private readonly Func<Task> _waitForIdle;
-        private readonly Func<TimeSpan, Task> _fastForward;
-
-        private Task SystemIdle => _waitForIdle();
 
         private Task FastForward(TimeSpan howMuch) => _fastForward(howMuch);
 
         public static IEnumerable<string[]> ParseMarbles(string line)
         {
-            return line.Select(kar => kar == '-' ? new string[0] : new[] { kar.ToString() });
+            return line.Select(kar => kar == '-' ? new string[0] : new[] {kar.ToString()});
+        }
+
+        protected IEnumerable<InputMarble> CreateInputMarbles(Func<string, Task> whatToDo, string[] tokens, int time)
+        {
+            return tokens.Select(token => new InputMarble(time, token, () => whatToDo(token)));
         }
 
         protected class Expectation
@@ -86,7 +98,6 @@ namespace Divverence.MarbleTesting
                     return false;
 
                 foreach (var exp in expectations)
-                {
                     try
                     {
                         exp.Assertion();
@@ -99,12 +110,9 @@ namespace Divverence.MarbleTesting
                         throw new Exception(
                             $"Message '{exp.Token}' not received at time {time} on timeline {MarbleString}", e);
                     }
-                }
                 return true;
             }
         }
-
-        protected List<ExpectedMarbles> ExpectedMarbleStrings = new List<ExpectedMarbles>();
 
         protected class InputMarble
         {
@@ -149,12 +157,5 @@ namespace Divverence.MarbleTesting
                 }
             }
         }
-
-        protected IEnumerable<InputMarble> CreateInputMarbles(Func<string, Task> whatToDo, string[] tokens, int time)
-        {
-            return tokens.Select(token => new InputMarble(time, token, () => whatToDo(token)));
-        }
-
-        protected List<InputMarbles> Inputs = new List<InputMarbles>();
     }
 }
