@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting", "Divverence.MarbleTesting\Divverence.MarbleTesting.csproj", "{01C2AA70-2E5D-43D3-ACA9-A79327897777}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting.Akka", "Divverence.MarbleTesting.Akka\Divverence.MarbleTesting.Akka.csproj", "{FE0E1FA1-5467-433D-9265-5765C78F25FC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01C2AA70-2E5D-43D3-ACA9-A79327897777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01C2AA70-2E5D-43D3-ACA9-A79327897777}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01C2AA70-2E5D-43D3-ACA9-A79327897777}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01C2AA70-2E5D-43D3-ACA9-A79327897777}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE0E1FA1-5467-433D-9265-5765C78F25FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE0E1FA1-5467-433D-9265-5765C78F25FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE0E1FA1-5467-433D-9265-5765C78F25FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE0E1FA1-5467-433D-9265-5765C78F25FC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
