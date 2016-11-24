@@ -7,9 +7,10 @@ using Akka.TestKit;
 
 namespace Divverence.MarbleTesting.Akka
 {
-    public class AkkaMarbleTester : MarbleTester
+    public class AkkaMarbleTest : MarbleTest
     {
-        public AkkaMarbleTester(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward) : base(waitForIdle, fastForward)
+        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward)
+            : base(waitForIdle, fastForward)
         {
         }
 
@@ -18,7 +19,8 @@ namespace Divverence.MarbleTesting.Akka
 
         public void WhenTelling<T>(string timeline, IActorRef toWhom, Func<string, Task<T>> whatToSend)
         {
-            var actions = ParseMarbles(timeline).SelectMany((tokens, t) => CreateTestAction(whatToSend, toWhom, tokens, t));
+            var actions =
+                ParseMarbles(timeline).SelectMany((tokens, t) => CreateTestAction(whatToSend, toWhom, tokens, t));
             Inputs.Add(new InputMarbles(timeline, actions));
         }
 
@@ -48,8 +50,7 @@ namespace Divverence.MarbleTesting.Akka
         private IEnumerable<InputMarble> CreateTestAction<T>(Func<string, Task<T>> whatToSend, IActorRef toWhom,
             string[] tokens, int time)
         {
-            return tokens.Select(token => new InputMarble(time, async () => toWhom.Tell(await whatToSend(token))));
+            return tokens.Select(token => new InputMarble(time, token, async () => toWhom.Tell(await whatToSend(token))));
         }
-
     }
 }
