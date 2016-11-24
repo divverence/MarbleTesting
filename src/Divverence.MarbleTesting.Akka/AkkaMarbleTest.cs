@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.TestKit;
+using Divverence.MarbleTesting.Akka.Async;
 
 namespace Divverence.MarbleTesting.Akka
 {
     public class AkkaMarbleTest : MarbleTest
     {
-        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward)
-            : base(waitForIdle, fastForward)
+        public AkkaMarbleTest(ActorSystem sys)
+            : base(MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward)
         {
         }
 

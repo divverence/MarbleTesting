@@ -41,12 +41,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AkkaMarbleTest.cs" />
+    <Compile Include="Async\ActorSystemExtensions.cs" />
+    <Compile Include="Async\AsyncTestKitHelper.cs" />
+    <Compile Include="Async\AwaitableTaskDispatcher.cs" />
+    <Compile Include="Async\AwaitableTaskDispatcherConfigurator.cs" />
+    <Compile Include="Async\IWaitForIdleOrActive.cs" />
+    <Compile Include="Async\MultiDispatcherAwaiter.cs" />
+    <Compile Include="Async\TestKitExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <EmbeddedResource Include="Async\AsyncTesting.conf" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +66,7 @@
       <Name>Divverence.MarbleTesting</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
