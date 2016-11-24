@@ -7,12 +7,17 @@
 *.sln.docstates
 *.nupkg
 
+#project.json stuff
+*.lock.json
+*.nuget.props
+*.nuget.targets
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 x64/
-[Bb]uilt/
+buil[dt]/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -191,3 +196,4 @@ ModelManifest.xml
 
 # ncrunch
 _NCrunch_
+/src/.vs/config/applicationhost.config
