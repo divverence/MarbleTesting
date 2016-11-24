@@ -2,15 +2,16 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <CopyNuGetImplementations>true</CopyNuGetImplementations>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EA0993D7-891A-44BF-A72A-2231AD6D1350}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Divverence.MarbleTesting.Akka</RootNamespace>
-    <AssemblyName>Divverence.MarbleTesting.Akka</AssemblyName>
+    <RootNamespace>Divverence.MarbleTesting.Tests</RootNamespace>
+    <AssemblyName>Divverence.MarbleTesting.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectGuid>{FE0E1FA1-5467-433D-9265-5765C78F25FC}</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,20 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AkkaMarbleTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="project.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj">
+    <ProjectReference Include="..\..\src\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj">
       <Project>{01c2aa70-2e5d-43d3-aca9-a79327897777}</Project>
       <Name>Divverence.MarbleTesting</Name>
     </ProjectReference>
