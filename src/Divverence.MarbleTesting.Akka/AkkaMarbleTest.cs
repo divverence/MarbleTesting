@@ -16,10 +16,10 @@ namespace Divverence.MarbleTesting.Akka
         }
 
         public void WhenTelling(string timeline, IActorRef toWhom, Func<string, object> whatToSend)
-            => WhenTelling(timeline, toWhom, token => Task.FromResult(whatToSend(token)));
+            => WhenTelling(timeline, toWhom, marble => Task.FromResult(whatToSend(marble)));
 
         public void WhenTelling<T>(string timeline, IActorRef toWhom, Func<string, Task<T>> whatToSend)
-            => WhenDoing(timeline, async token => toWhom.Tell(await whatToSend(token)));
+            => WhenDoing(timeline, async marble => toWhom.Tell(await whatToSend(marble)));
 
         public void ExpectMsgs<T>(string timeline, TestProbe probe, Func<string, T, bool> predicate)
         {
@@ -29,12 +29,12 @@ namespace Divverence.MarbleTesting.Akka
         }
 
         public void ExpectMsgs(string timeline, TestProbe probe)
-            => ExpectMsgs<string>(timeline, probe, (token, msg) => token == msg);
+            => ExpectMsgs<string>(timeline, probe, (marble, msg) => marble == msg);
 
         private IEnumerable<ExpectedMarble> CreateExpectations<T>(Moment moment, TestProbe probe,
             Func<string, T, bool> predicate)
         {
-            return moment.Marbles.Where(m => m != "^")
+            return moment.Marbles
                 .Select(
                     marble =>
                         new ExpectedMarble(moment.Time, marble,

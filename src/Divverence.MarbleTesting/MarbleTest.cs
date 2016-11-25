@@ -43,14 +43,14 @@ namespace Divverence.MarbleTesting
         }
 #pragma warning disable 1998 // Seems the best way to convert Action<string> into a Func<string,Task> ...
         public void WhenDoing(string timeline, Action<string> whatToDo)
-            => WhenDoing(timeline, async token => whatToDo(token));
+            => WhenDoing(timeline, async marble => whatToDo(marble));
 #pragma warning restore 1998
 
         private Task FastForward(TimeSpan howMuch) => _fastForward(howMuch);
 
         protected IEnumerable<InputMarble> CreateInputMarbles(Moment moment, Func<string, Task> whatToDo)
         {
-            return moment.Marbles.Select(token => new InputMarble(moment.Time, token, () => whatToDo(token)));
+            return moment.Marbles.Select(marble => new InputMarble(moment.Time, marble, () => whatToDo(marble)));
         }
 
         protected class ExpectedMarble
@@ -107,15 +107,15 @@ namespace Divverence.MarbleTesting
 
         protected class InputMarble
         {
-            public InputMarble(int time, string token, Func<Task> action)
+            public InputMarble(int time, string marble, Func<Task> action)
             {
                 Time = time;
-                Token = token;
+                Marble = marble;
                 Action = action;
             }
 
             public int Time { get; }
-            public string Token { get; }
+            public string Marble { get; }
             public Func<Task> Action { get; }
         }
 
@@ -144,7 +144,7 @@ namespace Divverence.MarbleTesting
                 catch (Exception e)
                 {
                     throw new Exception(
-                        $"Error when firing marble '{m.Token}' at time {time} on marble string {MarbleString}", e);
+                        $"Error when firing marble '{m.Marble}' at time {time} on marble string {MarbleString}", e);
                 }
             }
         }
