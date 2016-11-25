@@ -34,7 +34,7 @@ namespace Divverence.MarbleTesting.Akka
         private IEnumerable<ExpectedMarble> CreateExpectations<T>(Moment moment, TestProbe probe,
             Func<string, T, bool> predicate)
         {
-            return moment.Marbles
+            return moment.Marbles.Where(m => m != "^")
                 .Select(
                     marble =>
                         new ExpectedMarble(moment.Time, marble,
