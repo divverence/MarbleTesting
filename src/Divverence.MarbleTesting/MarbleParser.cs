@@ -6,6 +6,6 @@ namespace Divverence.MarbleTesting
     public static class MarbleParser
     {
         public static IEnumerable<Moment> ParseMarbles(string line) => line.Select(
-            (time, character) => character == '-' ? new Moment(time) : new Moment(time, character.ToString()));
+            (character, time) => character == '-' ? new Moment(time) : new Moment(time, character.ToString()));
     }
 }
