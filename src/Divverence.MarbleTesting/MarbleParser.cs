@@ -30,7 +30,6 @@ namespace Divverence.MarbleTesting
                 switch (character)
                 {
                     case ' ':
-                        continue;
                     case '-':
                         retVal.Add(new Moment(time));
                         break;
@@ -53,8 +52,8 @@ namespace Divverence.MarbleTesting
                 else switch (character)
                 {
                     case ' ':
-                        continue;
-                    case '-':
+                            throw new ArgumentException("Cannot use <space> within a group", nameof(line));
+                        case '-':
                             throw new ArgumentException("Cannot use - within a group", nameof(line));
                     case '^':
                         if (timeOffset.HasValue)

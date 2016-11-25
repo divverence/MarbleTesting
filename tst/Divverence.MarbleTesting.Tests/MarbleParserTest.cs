@@ -160,10 +160,10 @@ namespace Divverence.MarbleTesting.Tests
         }
 
         [Fact]
-        public void Should_ignore_spaces()
+        public void Spaces_are_dashes()
         {
-            var actual = MarbleParser.ParseMarbles("   a b  c -  (de)   f  ");
-            var expected = MarbleParser.ParseMarbles("abc-(de)f");
+            var actual = MarbleParser.ParseMarbles(  "   a b  c -  (de)   f  ");
+            var expected = MarbleParser.ParseMarbles("---a-b--c----(de)---f--");
             actual.Select(m => m.Time).Should().BeEquivalentTo(expected.Select(m => m.Time));
             actual.Select(m => string.Concat(m.Marbles)).Should().BeEquivalentTo(expected.Select(m => string.Concat(m.Marbles)));
         }
