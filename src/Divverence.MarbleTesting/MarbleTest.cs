@@ -9,11 +9,8 @@ namespace Divverence.MarbleTesting
     public class MarbleTest
     {
         private readonly Func<TimeSpan, Task> _fastForward;
-
         private readonly Func<Task> _waitForIdle;
-
-        protected List<ExpectedMarbles> ExpectedMarbleStrings = new List<ExpectedMarbles>();
-
+        protected List<ExpectedMarbles> Expectations = new List<ExpectedMarbles>();
         protected List<InputMarbles> Inputs = new List<InputMarbles>();
 
         public MarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward)
@@ -26,13 +23,14 @@ namespace Divverence.MarbleTesting
 
         public async Task Run(TimeSpan? interval = null)
         {
-            var maxTime = ExpectedMarbleStrings.Max(etl => etl.LastTime);
-            for (var time = 0; time <= maxTime; time++)
+            var maxTime = Expectations.Max(etl => etl.LastTime);
+            var minTime = Expectations.Max(etl => etl.FirstTime);
+            for (var time = minTime; time <= maxTime; time++)
             {
                 var localTime = time;
                 await Task.WhenAll(Inputs.Select(atl => atl.Run(localTime)));
                 await SystemIdle;
-                ExpectedMarbleStrings.ForEach(etl => etl.Verify(time));
+                Expectations.ForEach(etl => etl.Verify(time));
                 if (interval.HasValue)
                     await FastForward(interval.Value);
             }
@@ -40,56 +38,49 @@ namespace Divverence.MarbleTesting
 
         public void WhenDoing(string timeline, Func<string, Task> whatToDo)
         {
-            var actions = ParseMarbles(timeline).SelectMany((tokens, t) => CreateInputMarbles(whatToDo, tokens, t));
+            var actions = MarbleParser.ParseMarbles(timeline).SelectMany(moment => CreateInputMarbles(moment, whatToDo));
             Inputs.Add(new InputMarbles(timeline, actions));
         }
-
+#pragma warning disable 1998 // Seems the best way to convert Action<string> into a Func<string,Task> ...
         public void WhenDoing(string timeline, Action<string> whatToDo)
-        {
-            var actions =
-                ParseMarbles(timeline)
-                    .SelectMany((tokens, t) => CreateInputMarbles(async token => whatToDo(token), tokens, t));
-            Inputs.Add(new InputMarbles(timeline, actions));
-        }
+            => WhenDoing(timeline, async token => whatToDo(token));
+#pragma warning restore 1998
 
         private Task FastForward(TimeSpan howMuch) => _fastForward(howMuch);
 
-        public static IEnumerable<string[]> ParseMarbles(string line)
+        protected IEnumerable<InputMarble> CreateInputMarbles(Moment moment, Func<string, Task> whatToDo)
         {
-            return line.Select(kar => kar == '-' ? new string[0] : new[] {kar.ToString()});
+            return moment.Marbles.Select(token => new InputMarble(moment.Time, token, () => whatToDo(token)));
         }
 
-        protected IEnumerable<InputMarble> CreateInputMarbles(Func<string, Task> whatToDo, string[] tokens, int time)
+        protected class ExpectedMarble
         {
-            return tokens.Select(token => new InputMarble(time, token, () => whatToDo(token)));
-        }
-
-        protected class Expectation
-        {
-            public Expectation(int time, string token, Action assertion)
+            public ExpectedMarble(int time, string marble, Action assertion)
             {
                 Time = time;
-                Token = token;
+                Marble = marble;
                 Assertion = assertion;
             }
 
             public int Time { get; }
-            public string Token { get; }
+            public string Marble { get; }
             public Action Assertion { get; }
         }
 
         protected class ExpectedMarbles
         {
-            public ExpectedMarbles(string marbleString, IEnumerable<Expectation> expectations)
+            public ExpectedMarbles(string marbleString, IEnumerable<ExpectedMarble> expectations)
             {
                 MarbleString = marbleString;
                 Expectations = expectations.ToImmutableList();
+                FirstTime = Expectations.Min(e => e.Time);
                 LastTime = Expectations.Max(e => e.Time);
             }
 
             public string MarbleString { get; }
-            public ImmutableList<Expectation> Expectations { get; }
+            public ImmutableList<ExpectedMarble> Expectations { get; }
             public int LastTime { get; set; }
+            public int FirstTime { get; set; }
 
             public bool Verify(int time)
             {
@@ -104,11 +95,11 @@ namespace Divverence.MarbleTesting
                     }
                     catch (Exception e)
                     {
-                        if (exp.Token == null)
+                        if (exp.Marble == null)
                             throw new Exception(
-                                $"Unexpected message(s) received at time {time} on timeline {MarbleString}", e);
+                                $"Unexpected event received at time {time} on timeline {MarbleString}", e);
                         throw new Exception(
-                            $"Message '{exp.Token}' not received at time {time} on timeline {MarbleString}", e);
+                            $"Marble '{exp.Marble}' not received at time {time} on timeline {MarbleString}", e);
                     }
                 return true;
             }

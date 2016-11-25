@@ -19,39 +19,27 @@ namespace Divverence.MarbleTesting.Akka
             => WhenTelling(timeline, toWhom, token => Task.FromResult(whatToSend(token)));
 
         public void WhenTelling<T>(string timeline, IActorRef toWhom, Func<string, Task<T>> whatToSend)
-        {
-            var actions =
-                ParseMarbles(timeline).SelectMany((tokens, t) => CreateTestAction(whatToSend, toWhom, tokens, t));
-            Inputs.Add(new InputMarbles(timeline, actions));
-        }
+            => WhenDoing(timeline, async token => toWhom.Tell(await whatToSend(token)));
 
         public void ExpectMsgs<T>(string timeline, TestProbe probe, Func<string, T, bool> predicate)
         {
             var expectations =
-                ParseMarbles(timeline).SelectMany((tokens, t) => GetExpectations(predicate, probe, tokens, t));
-            ExpectedMarbleStrings.Add(new ExpectedMarbles(timeline, expectations));
+                MarbleParser.ParseMarbles(timeline).SelectMany(moment => CreateExpectations(moment, probe, predicate));
+            Expectations.Add(new ExpectedMarbles(timeline, expectations));
         }
 
         public void ExpectMsgs(string timeline, TestProbe probe)
-        {
-            ExpectMsgs<string>(timeline, probe, (token, msg) => token == msg);
-        }
+            => ExpectMsgs<string>(timeline, probe, (token, msg) => token == msg);
 
-        private IEnumerable<Expectation> GetExpectations<T>(Func<string, T, bool> predicate, TestProbe probe,
-            string[] tokens, int time)
+        private IEnumerable<ExpectedMarble> CreateExpectations<T>(Moment moment, TestProbe probe,
+            Func<string, T, bool> predicate)
         {
-            return tokens
+            return moment.Marbles
                 .Select(
-                    token =>
-                        new Expectation(time, token,
-                            () => probe.ExpectMsg<T>(t => predicate(token, t), TimeSpan.Zero)))
-                .Concat(Enumerable.Repeat(new Expectation(time, null, () => probe.ExpectNoMsg(0)), 1));
-        }
-
-        private IEnumerable<InputMarble> CreateTestAction<T>(Func<string, Task<T>> whatToSend, IActorRef toWhom,
-            string[] tokens, int time)
-        {
-            return tokens.Select(token => new InputMarble(time, token, async () => toWhom.Tell(await whatToSend(token))));
+                    marble =>
+                        new ExpectedMarble(moment.Time, marble,
+                            () => probe.ExpectMsg<T>(t => predicate(marble, t), TimeSpan.Zero)))
+                .Concat(Enumerable.Repeat(new ExpectedMarble(moment.Time, null, () => probe.ExpectNoMsg(0)), 1));
         }
     }
 }
