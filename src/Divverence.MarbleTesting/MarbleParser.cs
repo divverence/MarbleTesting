@@ -6,25 +6,25 @@ namespace Divverence.MarbleTesting
 {
     public static class MarbleParser
     {
-        public static IEnumerable<Moment> ParseMarbles(string line)
+        public static IEnumerable<Moment> ParseSequence(string sequence)
         {
-            if (line == null)
-                throw new ArgumentNullException(nameof(line));
+            if (sequence == null)
+                throw new ArgumentNullException(nameof(sequence));
             int? timeOffset;
-            var moments = ParseMarbles(line, out timeOffset);
+            var moments = ParseSequence(sequence, out timeOffset);
             if (!timeOffset.HasValue || timeOffset.Value == 0)
                 return moments;
             return moments.Select(m => new Moment(m.Time + timeOffset.Value, m.Marbles));
         }
 
-        public static List<Moment> ParseMarbles(string line, out int? timeOffset)
+        private static IEnumerable<Moment> ParseSequence(string sequence, out int? timeOffset)
         {
             var retVal = new List<Moment>();
             var time = 0;
             int groupTime = 0;
             timeOffset = null;
             List<string> groupMarbles = null;
-            foreach (var character in line)
+            foreach (var character in sequence)
             {
                 if (groupMarbles == null)
                 switch (character)
@@ -35,7 +35,7 @@ namespace Divverence.MarbleTesting
                         break;
                     case '^':
                         if (timeOffset.HasValue)
-                            throw new ArgumentException("Only one ^ character allowed", nameof(line));
+                            throw new ArgumentException("Only one ^ character allowed", nameof(sequence));
                         timeOffset = -time;
                         retVal.Add(new Moment(time, character.ToString()));
                         break;
@@ -44,7 +44,7 @@ namespace Divverence.MarbleTesting
                         groupMarbles = new List<string>();
                         break;
                     case ')':
-                        throw new ArgumentException("Closing parentheses without opening parentheses", nameof(line));
+                        throw new ArgumentException("Closing parentheses without opening parentheses", nameof(sequence));
                     default:
                         retVal.Add(new Moment(time, character.ToString()));
                         break;
@@ -52,17 +52,17 @@ namespace Divverence.MarbleTesting
                 else switch (character)
                 {
                     case ' ':
-                            throw new ArgumentException("Cannot use <space> within a group", nameof(line));
+                            throw new ArgumentException("Cannot use <space> within a group", nameof(sequence));
                         case '-':
-                            throw new ArgumentException("Cannot use - within a group", nameof(line));
+                            throw new ArgumentException("Cannot use - within a group", nameof(sequence));
                     case '^':
                         if (timeOffset.HasValue)
-                            throw new ArgumentException("Only one ^ character allowed", nameof(line));
+                            throw new ArgumentException("Only one ^ character allowed", nameof(sequence));
                         timeOffset = -groupTime;
                         groupMarbles.Add(character.ToString());
                         break;
                     case '(':
-                        throw new ArgumentException("Cannot have nested parentheses", nameof(line));
+                        throw new ArgumentException("Cannot have nested parentheses", nameof(sequence));
                     case ')':
                         retVal.Add(new Moment(groupTime, groupMarbles.ToArray()));
                         groupMarbles = null;

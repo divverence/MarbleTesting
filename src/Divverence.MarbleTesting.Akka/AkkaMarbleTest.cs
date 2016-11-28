@@ -15,21 +15,21 @@ namespace Divverence.MarbleTesting.Akka
         {
         }
 
-        public void WhenTelling(string timeline, IActorRef toWhom, Func<string, object> whatToSend)
-            => WhenTelling(timeline, toWhom, marble => Task.FromResult(whatToSend(marble)));
+        public void WhenTelling(string sequence, IActorRef toWhom, Func<string, object> whatToSend)
+            => WhenTelling(sequence, toWhom, marble => Task.FromResult(whatToSend(marble)));
 
-        public void WhenTelling<T>(string timeline, IActorRef toWhom, Func<string, Task<T>> whatToSend)
-            => WhenDoing(timeline, async marble => toWhom.Tell(await whatToSend(marble)));
+        public void WhenTelling<T>(string sequence, IActorRef toWhom, Func<string, Task<T>> whatToSend)
+            => WhenDoing(sequence, async marble => toWhom.Tell(await whatToSend(marble)));
 
-        public void ExpectMsgs<T>(string timeline, TestProbe probe, Func<string, T, bool> predicate)
+        public void ExpectMsgs<T>(string sequence, TestProbe probe, Func<string, T, bool> predicate)
         {
-            var expectations =
-                MarbleParser.ParseMarbles(timeline).SelectMany(moment => CreateExpectations(moment, probe, predicate));
-            Expectations.Add(new ExpectedMarbles(timeline, expectations));
+            var expectations = MarbleParser.ParseSequence(sequence)
+                .SelectMany(moment => CreateExpectations(moment, probe, predicate));
+            Expectations.Add(new ExpectedMarbles(sequence, expectations));
         }
 
-        public void ExpectMsgs(string timeline, TestProbe probe)
-            => ExpectMsgs<string>(timeline, probe, (marble, msg) => marble == msg);
+        public void ExpectMsgs(string sequence, TestProbe probe)
+            => ExpectMsgs<string>(sequence, probe, (marble, msg) => marble == msg);
 
         private IEnumerable<ExpectedMarble> CreateExpectations<T>(Moment moment, TestProbe probe,
             Func<string, T, bool> predicate)

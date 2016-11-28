@@ -36,14 +36,14 @@ namespace Divverence.MarbleTesting
             }
         }
 
-        public void WhenDoing(string timeline, Func<string, Task> whatToDo)
+        public void WhenDoing(string sequence, Func<string, Task> whatToDo)
         {
-            var actions = MarbleParser.ParseMarbles(timeline).SelectMany(moment => CreateInputMarbles(moment, whatToDo));
-            Inputs.Add(new InputMarbles(timeline, actions));
+            var actions = MarbleParser.ParseSequence(sequence).SelectMany(moment => CreateInputMarbles(moment, whatToDo));
+            Inputs.Add(new InputMarbles(sequence, actions));
         }
 #pragma warning disable 1998 // Seems the best way to convert Action<string> into a Func<string,Task> ...
-        public void WhenDoing(string timeline, Action<string> whatToDo)
-            => WhenDoing(timeline, async marble => whatToDo(marble));
+        public void WhenDoing(string sequence, Action<string> whatToDo)
+            => WhenDoing(sequence, async marble => whatToDo(marble));
 #pragma warning restore 1998
 
         private Task FastForward(TimeSpan howMuch) => _fastForward(howMuch);
@@ -69,15 +69,15 @@ namespace Divverence.MarbleTesting
 
         protected class ExpectedMarbles
         {
-            public ExpectedMarbles(string marbleString, IEnumerable<ExpectedMarble> expectations)
+            public ExpectedMarbles(string sequence, IEnumerable<ExpectedMarble> expectations)
             {
-                MarbleString = marbleString;
+                Sequence = sequence;
                 Expectations = expectations.ToImmutableList();
                 FirstTime = Expectations.Min(e => e.Time);
                 LastTime = Expectations.Max(e => e.Time);
             }
 
-            public string MarbleString { get; }
+            public string Sequence { get; }
             public ImmutableList<ExpectedMarble> Expectations { get; }
             public int LastTime { get; set; }
             public int FirstTime { get; set; }
@@ -97,9 +97,9 @@ namespace Divverence.MarbleTesting
                     {
                         if (exp.Marble == null)
                             throw new Exception(
-                                $"Unexpected event received at time {time} on timeline {MarbleString}", e);
+                                $"Unexpected event received at time {time} on sequence {Sequence}", e);
                         throw new Exception(
-                            $"Marble '{exp.Marble}' not received at time {time} on timeline {MarbleString}", e);
+                            $"Marble '{exp.Marble}' not received at time {time} on sequence {Sequence}", e);
                     }
                 return true;
             }
@@ -121,13 +121,13 @@ namespace Divverence.MarbleTesting
 
         protected class InputMarbles
         {
-            public InputMarbles(string marbleString, IEnumerable<InputMarble> actions)
+            public InputMarbles(string sequence, IEnumerable<InputMarble> actions)
             {
-                MarbleString = marbleString;
+                Sequence = sequence;
                 Actions = actions.ToImmutableList();
             }
 
-            public string MarbleString { get; }
+            public string Sequence { get; }
             public ImmutableList<InputMarble> Actions { get; }
 
             public Task Run(int time)
@@ -144,7 +144,7 @@ namespace Divverence.MarbleTesting
                 catch (Exception e)
                 {
                     throw new Exception(
-                        $"Error when firing marble '{m.Marble}' at time {time} on marble string {MarbleString}", e);
+                        $"Error when firing marble '{m.Marble}' at time {time} on sequence {Sequence}", e);
                 }
             }
         }
