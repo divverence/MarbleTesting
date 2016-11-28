@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <iconUrl>http://www.divverence.com/favicon.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2016 Divverence B.V.</copyright>
+  </metadata>
+  <files>
+    <file src="..\..\built\Divverence.MarbleTesting\Divverence.MarbleTesting.pdb" target="lib\net452" />
+  </files>
+</package>
