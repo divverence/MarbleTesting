@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\built\SharedAssemblyInfo*.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AkkaMarbleTest.cs" />
     <Compile Include="Async\ActorSystemExtensions.cs" />
     <Compile Include="Async\AsyncTestKitHelper.cs" />

@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\built\SharedAssemblyInfo*.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="MarbleParser.cs" />
     <Compile Include="MarbleTest.cs" />
     <Compile Include="Moment.cs" />
