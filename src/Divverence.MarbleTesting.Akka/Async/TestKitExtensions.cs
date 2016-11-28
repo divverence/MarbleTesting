@@ -9,22 +9,22 @@ namespace Divverence.MarbleTesting.Akka.Async
     /// </summary>
     public static class TestKitExtensions
     {
-        public static async Task ExpectNoMsg( this TestKitBase testKit )
+        public static async Task ExpectNoMsgAsync( this TestKitBase testKit )
         {
             await testKit.Sys.Idle();
             testKit.ExpectNoMsg(TimeSpan.Zero);
         }
 
-        public static async Task ExpectMsg<T>(this TestKitBase testKit)
+        public static async Task<T> ExpectMsgAsync<T>(this TestKitBase testKit)
         {
             await testKit.Sys.Idle();
-            testKit.ExpectMsg<T>();
+            return testKit.ExpectMsg<T>(TimeSpan.Zero);
         }
 
-        public static async Task ExpectMsg<T>(this TestKitBase testKit, Predicate<T> predicate)
+        public static async Task<T> ExpectMsgAsync<T>(this TestKitBase testKit, Predicate<T> predicate)
         {
             await testKit.Sys.Idle();
-            testKit.ExpectMsg(predicate);
+            return testKit.ExpectMsg(predicate, TimeSpan.Zero);
         }
     }
 }
