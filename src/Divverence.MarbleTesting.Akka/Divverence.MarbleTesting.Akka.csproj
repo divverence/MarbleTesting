@@ -51,6 +51,7 @@
     <Compile Include="Async\IWaitForIdleOrActive.cs" />
     <Compile Include="Async\MultiDispatcherAwaiter.cs" />
     <Compile Include="Async\TestKitExtensions.cs" />
+    <Compile Include="Async\TestProbeExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
