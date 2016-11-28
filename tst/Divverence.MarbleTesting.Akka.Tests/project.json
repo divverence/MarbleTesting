@@ -1,0 +1,12 @@
+﻿{
+  "dependencies": {
+    "FluentAssertions": "4.17.0",
+    "xunit": "2.1.0"
+  },
+  "frameworks": {
+    "net452": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}

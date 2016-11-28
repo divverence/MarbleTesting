@@ -111,7 +111,7 @@ namespace Divverence.MarbleTesting.Akka.Async
         {
             return
                 ConfigurationFactory.FromResource<AsyncTestKitHelper>(
-                    $"{nameof(Divverence.MarbleTesting.Akka.Async)}.AsyncTesting.conf");
+                    $"{typeof(AsyncTestKitHelper).Namespace}.AsyncTesting.conf");
         }
 
         public static Config GetDefaultConfigWith(string hokon)
