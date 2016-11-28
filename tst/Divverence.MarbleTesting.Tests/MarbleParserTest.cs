@@ -26,6 +26,7 @@ namespace Divverence.MarbleTesting.Tests
         [InlineData("((")]
         [InlineData("())")]
         [InlineData(")")]
+        [InlineData("(")]
         public void Should_throw_ArgumentException_when_passing_wrong_parentheses( string marbleLine )
         {
             Action parsingNull = () => MarbleParser.ParseSequence(marbleLine);

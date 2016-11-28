@@ -27,53 +27,57 @@ namespace Divverence.MarbleTesting
             foreach (var character in sequence)
             {
                 if (groupMarbles == null)
-                switch (character)
-                {
-                    case ' ':
-                    case '-':
-                        retVal.Add(new Moment(time));
-                        break;
-                    case '^':
-                        if (timeOffset.HasValue)
-                            throw new ArgumentException("Only one ^ character allowed", nameof(sequence));
-                        timeOffset = -time;
-                        retVal.Add(new Moment(time, character.ToString()));
-                        break;
-                    case '(':
-                        groupTime = time;
-                        groupMarbles = new List<string>();
-                        break;
-                    case ')':
-                        throw new ArgumentException("Closing parentheses without opening parentheses", nameof(sequence));
-                    default:
-                        retVal.Add(new Moment(time, character.ToString()));
-                        break;
-                }
-                else switch (character)
-                {
-                    case ' ':
+                    switch (character)
+                    {
+                        case ' ':
+                        case '-':
+                            retVal.Add(new Moment(time));
+                            break;
+                        case '^':
+                            if (timeOffset.HasValue)
+                                throw new ArgumentException("Only one ^ character allowed", nameof(sequence));
+                            timeOffset = -time;
+                            retVal.Add(new Moment(time, character.ToString()));
+                            break;
+                        case '(':
+                            groupTime = time;
+                            groupMarbles = new List<string>();
+                            break;
+                        case ')':
+                            throw new ArgumentException("Closing parentheses without opening parentheses",
+                                nameof(sequence));
+                        default:
+                            retVal.Add(new Moment(time, character.ToString()));
+                            break;
+                    }
+                else
+                    switch (character)
+                    {
+                        case ' ':
                             throw new ArgumentException("Cannot use <space> within a group", nameof(sequence));
                         case '-':
                             throw new ArgumentException("Cannot use - within a group", nameof(sequence));
-                    case '^':
-                        if (timeOffset.HasValue)
-                            throw new ArgumentException("Only one ^ character allowed", nameof(sequence));
-                        timeOffset = -groupTime;
-                        groupMarbles.Add(character.ToString());
-                        break;
-                    case '(':
-                        throw new ArgumentException("Cannot have nested parentheses", nameof(sequence));
-                    case ')':
-                        retVal.Add(new Moment(groupTime, groupMarbles.ToArray()));
-                        groupMarbles = null;
-                        break;
-                    default:
-                        groupMarbles.Add(character.ToString());
-                        break;
-                }
+                        case '^':
+                            if (timeOffset.HasValue)
+                                throw new ArgumentException("Only one ^ character allowed", nameof(sequence));
+                            timeOffset = -groupTime;
+                            groupMarbles.Add(character.ToString());
+                            break;
+                        case '(':
+                            throw new ArgumentException("Cannot have nested parentheses", nameof(sequence));
+                        case ')':
+                            retVal.Add(new Moment(groupTime, groupMarbles.ToArray()));
+                            groupMarbles = null;
+                            break;
+                        default:
+                            groupMarbles.Add(character.ToString());
+                            break;
+                    }
 
                 time++;
             }
+            if (groupMarbles != null)
+                throw new ArgumentException("Opening parentheses without closing parentheses", nameof(sequence));
             return retVal;
         }
     }
