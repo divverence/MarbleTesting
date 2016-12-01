@@ -62,7 +62,7 @@ namespace Divverence.MarbleTesting.Tests
         public void Should_have_time_increasing_from_0()
         {
             var actual = MarbleParser.ParseSequence("abc");
-            actual.Select(m => m.Time).Should().BeEquivalentTo(new[] {0, 1, 2});
+            actual.Select(m => m.Time).Should().Equal(0, 1, 2);
         }
 
         [Fact]
@@ -71,68 +71,68 @@ namespace Divverence.MarbleTesting.Tests
             var actual = MarbleParser.ParseSequence("^");
             actual.Should().HaveCount(1);
             actual.Single().Time.Should().Be(0);
-            actual.Single().Marbles.Should().BeEquivalentTo("^");
+            actual.Single().Marbles.Should().Equal("^");
         }
 
         [Fact]
         public void Should_have_time_increasing_from_minus3()
         {
             var actual = MarbleParser.ParseSequence("abc^def");
-            actual.Select(m => m.Time).Should().BeEquivalentTo(new[] { -3, -2, -1, 0, 1, 2, 3 });
+            actual.Select(m => m.Time).Should().Equal(-3, -2, -1, 0, 1, 2, 3);
         }
 
         [Fact]
         public void Should_have_time_increasing_from_minus2()
         {
             var actual = MarbleParser.ParseSequence("ab(c^d)ef");
-            actual.Select(m => string.Concat(m.Marbles)).Should().BeEquivalentTo("a", "b", "c^d", "e", "f");
-            actual.Select(m => m.Time).Should().BeEquivalentTo(new[] { -2, -1, 0, 5, 6 });
+            actual.Select(m => string.Concat(m.Marbles)).Should().Equal("a", "b", "c^d", "e", "f");
+            actual.Select(m => m.Time).Should().Equal(-2, -1, 0, 5, 6);
         }
 
         [Fact]
         public void Supports_group_in_middle()
         {
             var actual = MarbleParser.ParseSequence("ab(cd)ef");
-            actual.Select(m => string.Concat(m.Marbles)).Should().BeEquivalentTo("a", "b", "cd", "e", "f");
-            actual.Select(m => m.Time).Should().BeEquivalentTo(new[] {0, 1, 2, 6, 7});
+            actual.Select(m => string.Concat(m.Marbles)).Should().Equal("a", "b", "cd", "e", "f");
+            actual.Select(m => m.Time).Should().Equal(0, 1, 2, 6, 7);
         }
 
         [Fact]
         public void Supports_multiple_groups()
         {
             var actual = MarbleParser.ParseSequence("ab(cd)ef(gh)");
-            actual.Select(m => string.Concat(m.Marbles)).Should().BeEquivalentTo("a", "b", "cd", "e", "f", "gh");
-            actual.Select(m => m.Time).Should().BeEquivalentTo(new[] { 0, 1, 2, 6, 7, 8 });
+            actual.Select(m => string.Concat(m.Marbles)).Should().Equal("a", "b", "cd", "e", "f", "gh");
+            actual.Select(m => m.Time).Should().Equal(0, 1, 2, 6, 7, 8);
         }
 
         [Fact]
         public void Supports_group_at_start()
         {
             var actual = MarbleParser.ParseSequence("(cd)ef");
-            actual.Select(m => string.Concat(m.Marbles)).Should().BeEquivalentTo("cd", "e", "f");
-            actual.Select(m => m.Time).Should().BeEquivalentTo(new[] { 0, 4, 5 });
+            actual.Select(m => string.Concat(m.Marbles)).Should().Equal("cd", "e", "f");
+            actual.Select(m => m.Time).Should().Equal(0, 4, 5);
         }
 
         [Fact]
         public void Supports_group_at_end()
         {
             var actual = MarbleParser.ParseSequence("ab(cd)");
-            actual.Select(m => string.Concat(m.Marbles)).Should().BeEquivalentTo("a", "b", "cd");
-            actual.Select(m => m.Time).Should().BeEquivalentTo(new[] { 0, 1, 2 });
+            actual.Select(m => string.Concat(m.Marbles)).Should().Equal("a", "b", "cd");
+            actual.Select(m => m.Time).Should().Equal(0, 1, 2);
         }
 
         [Fact]
         public void Should_return_one_marble_per_timeslot()
         {
             var actual = MarbleParser.ParseSequence("abc");
-            actual.Select(m => m.Marbles.Length).Should().BeEquivalentTo(new[] { 1, 1, 1 });
+            actual.Select(m => m.Marbles.Length).Should().Equal(1, 1, 1);
         }
 
         [Fact]
         public void Should_return_correct_marble_per_timeslot()
         {
             var actual = MarbleParser.ParseSequence("abc");
-            actual.Select(m => m.Marbles.FirstOrDefault()).Should().BeEquivalentTo("a", "b", "c");
+            actual.Select(m => m.Marbles.FirstOrDefault()).Should().Equal("a", "b", "c");
         }
 
         [Fact]
@@ -156,8 +156,8 @@ namespace Divverence.MarbleTesting.Tests
         public void Should_use_single_moment_for_all_grouped_marbles()
         {
             var actual = MarbleParser.ParseSequence("(abc)");
-            actual.Select(m => m.Time).Should().BeEquivalentTo(new[] { 0 });
-            actual.Single().Marbles.Should().BeEquivalentTo("a", "b", "c");
+            actual.Select(m => m.Time).Should().Equal(0);
+            actual.Single().Marbles.Should().Equal("a", "b", "c");
         }
 
         [Fact]
@@ -165,8 +165,8 @@ namespace Divverence.MarbleTesting.Tests
         {
             var actual = MarbleParser.ParseSequence(  "   a b  c -  (de)   f  ");
             var expected = MarbleParser.ParseSequence("---a-b--c----(de)---f--");
-            actual.Select(m => m.Time).Should().BeEquivalentTo(expected.Select(m => m.Time));
-            actual.Select(m => string.Concat(m.Marbles)).Should().BeEquivalentTo(expected.Select(m => string.Concat(m.Marbles)));
+            actual.Select(m => m.Time).Should().Equal(expected.Select(m => m.Time));
+            actual.Select(m => string.Concat(m.Marbles)).Should().Equal(expected.Select(m => string.Concat(m.Marbles)));
         }
     }
 }
