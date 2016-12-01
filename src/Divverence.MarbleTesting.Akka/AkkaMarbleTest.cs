@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Akka.Configuration;
 using Akka.TestKit;
 using Divverence.MarbleTesting.Akka.Async;
 
@@ -50,6 +51,16 @@ namespace Divverence.MarbleTesting.Akka
         {
             SetMarbleParser(marbleParserFunc);
         }
+
+        /// <summary>
+        /// Returns the piece of Akka.Net configuration that makes sure the Awaitable Dispatcher is used for both test probes and all actors. To be combined with your own Config.
+        /// </summary>
+        public static Config AsyncTestDispatcherConfig => ConfigExtensionsForAsync.AsyncTestDispatcherConfig;
+
+        /// <summary>
+        /// Returns the Akka.Testkit default config, patched with the settings that make sure the Awaitable Dispatcher is used for both test probes and all actors.
+        /// </summary>
+        public static Config AsyncTestingConfig => ConfigExtensionsForAsync.AsyncTestingConfig;
 
         public void WhenTelling(string sequence, IActorRef toWhom, Func<string, object> whatToSend)
             => WhenTelling(sequence, toWhom, marble => Task.FromResult(whatToSend(marble)));
