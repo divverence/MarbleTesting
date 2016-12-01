@@ -12,12 +12,15 @@ namespace Divverence.MarbleTesting
         private readonly Func<Task> _waitForIdle;
         protected List<ExpectedMarbles> Expectations = new List<ExpectedMarbles>();
         protected List<InputMarbles> Inputs = new List<InputMarbles>();
+        private static Func<string,IEnumerable<Moment>> _parseSequenceFunc = MarbleParser.ParseSequence;
 
         public MarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward)
         {
             _waitForIdle = waitForIdle;
             _fastForward = fastForward;
         }
+
+        public void SetMarbleParser(Func<string, IEnumerable<Moment>> parserFunc) => _parseSequenceFunc = parserFunc;
 
         private Task SystemIdle => _waitForIdle();
 
@@ -38,8 +41,13 @@ namespace Divverence.MarbleTesting
 
         public void WhenDoing(string sequence, Func<string, Task> whatToDo)
         {
-            var actions = MarbleParser.ParseSequence(sequence).SelectMany(moment => CreateInputMarbles(moment, whatToDo));
+            var actions = ParseSequence(sequence).SelectMany(moment => CreateInputMarbles(moment, whatToDo));
             Inputs.Add(new InputMarbles(sequence, actions));
+        }
+
+        protected static IEnumerable<Moment> ParseSequence(string sequence)
+        {
+            return _parseSequenceFunc(sequence);
         }
 #pragma warning disable 1998 // Seems the best way to convert Action<string> into a Func<string,Task> ...
         public void WhenDoing(string sequence, Action<string> whatToDo)

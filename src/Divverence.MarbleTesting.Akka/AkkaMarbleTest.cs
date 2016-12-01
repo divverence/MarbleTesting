@@ -23,7 +23,7 @@ namespace Divverence.MarbleTesting.Akka
 
         public void ExpectMsgs<T>(string sequence, TestProbe probe, Func<string, T, bool> predicate)
         {
-            var expectations = MarbleParser.ParseSequence(sequence)
+            var expectations = ParseSequence(sequence)
                 .SelectMany(moment => CreateExpectations(moment, probe, predicate));
             Expectations.Add(new ExpectedMarbles(sequence, expectations));
         }
