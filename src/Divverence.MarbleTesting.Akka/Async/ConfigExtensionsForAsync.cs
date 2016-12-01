@@ -14,7 +14,7 @@ namespace Divverence.MarbleTesting.Akka.Async
             => AsyncTestDispatcherConfig.WithFallback(baseConfig);
 
         public static string AsyncTestDispatcherConfigHocon { get; } =
-            $@"akka.actor.default-dispatcher.type = ""{typeof(AwaitableTaskDispatcher).AssemblyQualifiedName}""
-akka.test.test-actor.dispatcher.type = ""{typeof(AwaitableTaskDispatcher).AssemblyQualifiedName}""";
+            $@"akka.actor.default-dispatcher.type = ""{typeof(AwaitableTaskDispatcherConfigurator).AssemblyQualifiedName}""
+akka.test.test-actor.dispatcher.type = ""{typeof(AwaitableTaskDispatcherConfigurator).AssemblyQualifiedName}""";
     }
 }
