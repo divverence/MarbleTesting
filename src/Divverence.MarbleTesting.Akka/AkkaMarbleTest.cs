@@ -53,14 +53,16 @@ namespace Divverence.MarbleTesting.Akka
         }
 
         /// <summary>
-        /// Returns the piece of Akka.Net configuration that makes sure the Awaitable Dispatcher is used for both test probes and all actors. To be combined with your own Config.
+        /// Returns the piece of Akka.Net configuration that makes sure the Awaitable Dispatcher is used for both test probes and all actors.
+        /// It also makes sure the Akka Testkit TestScheduler is active
+        /// To be combined with your own Config.
         /// </summary>
-        public static Config AsyncTestDispatcherConfig => ConfigExtensionsForAsync.AsyncTestDispatcherConfig;
+        public static Config DispatcherAndSchedulerConfig => ConfigExtensionsForAsyncTesting.AwaitableTaskDispatcherConfig.WithTestScheduler();
 
         /// <summary>
-        /// Returns the Akka.Testkit default config, patched with the settings that make sure the Awaitable Dispatcher is used for both test probes and all actors.
+        /// Returns the Akka.Testkit default config, patched with the settings that make sure the Awaitable Dispatcher is used for both test probes and all actors, and TestScheduler from Akka Testkit is the active scheduler.
         /// </summary>
-        public static Config AsyncTestingConfig => ConfigExtensionsForAsync.AsyncTestingConfig;
+        public static Config AsyncTestingConfig => ConfigExtensionsForAsyncTesting.AsyncTestingConfig;
 
         public void WhenTelling(string sequence, IActorRef toWhom, Func<string, object> whatToSend)
             => WhenTelling(sequence, toWhom, marble => Task.FromResult(whatToSend(marble)));
