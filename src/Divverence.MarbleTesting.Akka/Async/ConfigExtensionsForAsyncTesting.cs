@@ -25,7 +25,7 @@ akka.test.test-actor.dispatcher.type = ""{typeof(AwaitableTaskDispatcherConfigur
         #region TestScheduler
 
         public static Config WithTestScheduler(this Config baseConfig)
-            => AwaitableTaskDispatcherConfig.WithFallback(baseConfig);
+            => TestSchedulerConfig.WithFallback(baseConfig);
 
         public static Config TestSchedulerConfig
             => ConfigurationFactory.ParseString(TestSchedulerHocon);
