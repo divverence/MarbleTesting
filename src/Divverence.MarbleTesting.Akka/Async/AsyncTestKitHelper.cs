@@ -107,17 +107,8 @@ namespace Divverence.MarbleTesting.Akka.Async
 
         #region Config
 
-        public static Config GetDefaultConfig()
-        {
-            return
-                ConfigurationFactory.FromResource<AsyncTestKitHelper>(
-                    $"{typeof(AsyncTestKitHelper).Namespace}.AsyncTesting.conf");
-        }
-
-        public static Config GetDefaultConfigWith(string hokon)
-        {
-            return ConfigurationFactory.ParseString(hokon).WithFallback(GetDefaultConfig());
-        }
+        public static Config GetDefaultConfig() => ConfigExtensionsForAsync.AsyncTestingConfig;
+        public static Config GetDefaultConfigWith(string hokon) => ConfigurationFactory.ParseString(hokon).WithFallback(ConfigExtensionsForAsync.AsyncTestingConfig);
 
         #endregion
     }

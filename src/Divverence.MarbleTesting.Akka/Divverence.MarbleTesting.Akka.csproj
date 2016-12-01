@@ -48,6 +48,7 @@
     <Compile Include="Async\AsyncTestKitHelper.cs" />
     <Compile Include="Async\AwaitableTaskDispatcher.cs" />
     <Compile Include="Async\AwaitableTaskDispatcherConfigurator.cs" />
+    <Compile Include="Async\ConfigExtensionsForAsync.cs" />
     <Compile Include="Async\IWaitForIdleOrActive.cs" />
     <Compile Include="Async\MultiDispatcherAwaiter.cs" />
     <Compile Include="Async\TestKitExtensions.cs" />
@@ -58,7 +59,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <EmbeddedResource Include="Async\AsyncTesting.conf" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
