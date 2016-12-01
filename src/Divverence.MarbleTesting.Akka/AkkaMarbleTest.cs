@@ -15,7 +15,7 @@ namespace Divverence.MarbleTesting.Akka
         {
         }
 
-        public AkkaMarbleTest(ActorSystem sys, Func<string,IEnumerable<Moment>> marbleParserFunc ) : this(sys)
+        public AkkaMarbleTest(ActorSystem sys, Func<string, IEnumerable<Moment>> marbleParserFunc) : this(sys)
         {
             SetMarbleParser(marbleParserFunc);
         }
@@ -24,7 +24,8 @@ namespace Divverence.MarbleTesting.Akka
         {
         }
 
-        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward, Func<string, IEnumerable<Moment>> marbleParserFunc) : this(waitForIdle, fastForward)
+        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward,
+            Func<string, IEnumerable<Moment>> marbleParserFunc) : this(waitForIdle, fastForward)
         {
             SetMarbleParser(marbleParserFunc);
         }
