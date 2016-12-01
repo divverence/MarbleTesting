@@ -11,11 +11,20 @@ namespace Divverence.MarbleTesting.Akka
     public class AkkaMarbleTest : MarbleTest
     {
         public AkkaMarbleTest(ActorSystem sys)
-            : base(MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward)
+            : this(MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward)
         {
         }
 
         public AkkaMarbleTest(ActorSystem sys, Func<string,IEnumerable<Moment>> marbleParserFunc ) : this(sys)
+        {
+            SetMarbleParser(marbleParserFunc);
+        }
+
+        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward) : base(waitForIdle, fastForward)
+        {
+        }
+
+        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward, Func<string, IEnumerable<Moment>> marbleParserFunc) : this(waitForIdle, fastForward)
         {
             SetMarbleParser(marbleParserFunc);
         }
@@ -32,6 +41,9 @@ namespace Divverence.MarbleTesting.Akka
                 .SelectMany(moment => CreateExpectations(moment, probe, predicate));
             Expectations.Add(new ExpectedMarbles(sequence, expectations));
         }
+
+        public void ExpectMsgs(string sequence, TestProbe probe, Func<string, object, bool> predicate)
+            => ExpectMsgs<object>(sequence, probe, predicate);
 
         public void ExpectMsgs(string sequence, TestProbe probe)
             => ExpectMsgs<string>(sequence, probe, (marble, msg) => marble == msg);
