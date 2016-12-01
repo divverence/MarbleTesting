@@ -15,6 +15,11 @@ namespace Divverence.MarbleTesting.Akka
         {
         }
 
+        public AkkaMarbleTest(ActorSystem sys, Func<string,IEnumerable<Moment>> marbleParserFunc ) : this(sys)
+        {
+            SetMarbleParser(marbleParserFunc);
+        }
+
         public void WhenTelling(string sequence, IActorRef toWhom, Func<string, object> whatToSend)
             => WhenTelling(sequence, toWhom, marble => Task.FromResult(whatToSend(marble)));
 
