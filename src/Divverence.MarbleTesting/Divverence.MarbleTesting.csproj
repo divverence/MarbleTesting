@@ -43,6 +43,11 @@
     <Compile Include="..\..\built\SharedAssemblyInfo*.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ErrorMessageHelper.cs" />
+    <Compile Include="ExpectedMarble.cs" />
+    <Compile Include="ExpectedMarbles.cs" />
+    <Compile Include="InputMarble.cs" />
+    <Compile Include="InputMarbles.cs" />
     <Compile Include="MarbleParser.cs" />
     <Compile Include="MarbleTest.cs" />
     <Compile Include="Moment.cs" />
