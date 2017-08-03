@@ -77,20 +77,49 @@ namespace Divverence.MarbleTesting.Akka
             Expectations.Add(new ExpectedMarbles(sequence, expectations));
         }
 
+        public void ExpectMsgs<T>(string sequence, TestProbe probe, Func<string, Action<T>> predicate)
+        {
+            var expectations = ParseSequence(sequence)
+                .SelectMany(moment => CreateExpectations(moment, probe, predicate));
+            Expectations.Add(new ExpectedMarbles(sequence, expectations));
+        }
+
         public void ExpectMsgs(string sequence, TestProbe probe, Func<string, object, bool> predicate)
+            => ExpectMsgs<object>(sequence, probe, predicate);
+
+        public void ExpectMsgs(string sequence, TestProbe probe, Func<string, Action<object>> predicate)
             => ExpectMsgs<object>(sequence, probe, predicate);
 
         public void ExpectMsgs(string sequence, TestProbe probe)
             => ExpectMsgs<string>(sequence, probe, (marble, msg) => marble == msg);
 
-        private IEnumerable<ExpectedMarble> CreateExpectations<T>(Moment moment, TestProbe probe,
+        private static IEnumerable<ExpectedMarble> CreateExpectations<T>(Moment moment, TestKitBase probe,
             Func<string, T, bool> predicate)
+        {
+            return CreateExpectationsImpl(
+                moment, 
+                probe, 
+                m => () => probe.ExpectMsg<T>(t => predicate(m, t), TimeSpan.Zero));
+        }
+
+        private static IEnumerable<ExpectedMarble> CreateExpectations<T>(Moment moment, TestKitBase probe,
+            Func<string, Action<T>> assertionFactory)
+        {
+            return CreateExpectationsImpl(
+                moment, 
+                probe, 
+                m => () => probe.ExpectMsg(assertionFactory(m), TimeSpan.Zero));
+        }
+
+        private static IEnumerable<ExpectedMarble> CreateExpectationsImpl(
+            Moment moment, 
+            TestKitBase probe, 
+            Func<string, Action> expectionGenerator)
         {
             return moment.Marbles
                 .Select(
                     marble =>
-                        new ExpectedMarble(moment.Time, marble,
-                            () => probe.ExpectMsg<T>(t => predicate(marble, t), TimeSpan.Zero)))
+                        new ExpectedMarble(moment.Time, marble, expectionGenerator(marble)))
                 .Concat(Enumerable.Repeat(new ExpectedMarble(moment.Time, null, () => probe.ExpectNoMsg(0)), 1));
         }
     }
