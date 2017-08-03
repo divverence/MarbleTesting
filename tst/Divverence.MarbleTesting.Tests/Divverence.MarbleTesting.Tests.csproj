@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MarbleParserTest.cs" />
+    <Compile Include="ErrorMessageHelperTest.cs" />
+    <Compile Include="MultiCharMarbleParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
