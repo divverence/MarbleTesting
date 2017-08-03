@@ -35,9 +35,9 @@ namespace Divverence.MarbleTesting
                 {
                     if (exp.Marble == null)
                         throw new Exception(
-                            $"Unexpected event received at time {time} on sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}", e);
+                            $"Unexpected event received at time {time} in sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}", e);
                     throw new Exception(
-                        $"Marble '{exp.Marble}' not received at time {time} on sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}", e);
+                        $"Expected marble '{exp.Marble}' at time {time} but got a different marble in sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}", e);
                 }
             return true;
         }
