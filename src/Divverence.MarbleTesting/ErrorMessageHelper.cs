@@ -8,7 +8,8 @@ namespace Divverence.MarbleTesting
 
         internal static string SequenceWithPointerToOffendingMoment(string sequence, int offensiveMoment)
         {
-            return $"{Environment.NewLine}  {sequence}{Environment.NewLine}  {UpArrow.PadLeft(offensiveMoment + 1)}";
+            var trimmed = sequence.TrimStart();
+            return $"{Environment.NewLine}  {trimmed}{Environment.NewLine}  {UpArrow.PadLeft(offensiveMoment + 1)}";
         }
     }
 }
