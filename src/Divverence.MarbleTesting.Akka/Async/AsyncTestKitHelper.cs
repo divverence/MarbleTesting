@@ -103,6 +103,12 @@ namespace Divverence.MarbleTesting.Akka.Async
             return _akkaTestKit.ExpectMsg(pred, TimeSpan.Zero);
         }
 
+        public async Task<T> ExpectMsg<T>(Action<T> assertion)
+        {
+            await SystemIdle;
+            return _akkaTestKit.ExpectMsg(assertion, TimeSpan.Zero);
+        }
+
         #endregion
 
         #region Config
