@@ -196,4 +196,4 @@ ModelManifest.xml
 
 # ncrunch
 _NCrunch_
-/src/.vs/config/applicationhost.config
+.vs/
