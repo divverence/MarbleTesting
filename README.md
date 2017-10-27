@@ -1,6 +1,6 @@
-# Divverence.MarbleTest.Akka
+# Divverence.MarbleTesting.Akka
 
-Divverence.MarbleTest.Akka is a small library that allows to write tests for [Akka.Net](https://github.com/akkadotnet/akka.net/) actors / systems using marble diagrams in text form.  
+Divverence.MarbleTesting.Akka is a small library that allows to write tests for [Akka.Net](https://github.com/akkadotnet/akka.net/) actors / systems using marble diagrams in text form.  
 This library is inspired by the practice in the Rx / ReactiveStreams world to use [marble diagrams](http://rxmarbles.com/) to describe the (intented) behaviour of operators.
 It's our belief that this concept also applies very nicely to [Actors](https://petabridge.com/blog/akkadotnet-what-is-an-actor/) in an [actor model](https://en.wikipedia.org/wiki/Actor_model).
 Inspiration for this library came from the ideas of [Erik Meijer](https://twitter.com/headinthebox) and the [marble test features](https://github.com/ReactiveX/rxjs/blob/master/doc/writing-marble-tests.md) of RxJS v5.
@@ -11,11 +11,11 @@ For background on Marble Testing in general, check this nice [7 minutes introduc
 
 This library is complementary to [MarbleTest.Net](https://github.com/alexvictoor/MarbleTest.Net), which targets System.Reactive (Rx.Net) specifically. Thanks go out to the autor(s) of that project for ideas and possibly some source code.
 
-## Divverence.MarbleTest.Akka
+## Divverence.MarbleTesting.Akka
 
 To get the lib just use nuget as below:
 ```
-PM> Install-Package Divverence.MarbleTest.Akka
+PM> Install-Package Divverence.MarbleTesting.Akka
 ```
 
 ## Usage
