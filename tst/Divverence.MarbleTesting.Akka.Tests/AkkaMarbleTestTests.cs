@@ -45,7 +45,7 @@ namespace Divverence.MarbleTesting.Akka.Tests
         {
             var marbleTest = SetupMarbleTest(
                 "ab---d",
-                "a{bc}d",
+                "a<bc>d",
                 inputMappings);
             await marbleTest.Run();
         }
@@ -66,7 +66,7 @@ namespace Divverence.MarbleTesting.Akka.Tests
         {
             var marbleTest = SetupMarbleTest(
                 "ab---d",
-                "a{bc}d",
+                "a<bc>d",
                 inputMappings);
             var actual = await Assert.ThrowsAsync<Exception>(() => marbleTest.Run());
             Assert.NotNull(actual.InnerException);

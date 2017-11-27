@@ -55,7 +55,7 @@ namespace Divverence.MarbleTesting
                                 parsingState = ParsingState.InOrderedGroup;
                                 groupMarbles = new List<string>();
                                 break;
-                            case '{':
+                            case '<':
                                 groupTime = time;
                                 parsingState = ParsingState.InUnorderedGroup;
                                 unOrderedGroupMarbles = new List<string>();
@@ -63,7 +63,7 @@ namespace Divverence.MarbleTesting
                             case ')':
                                 throw new ArgumentException("Closing parentheses without opening parentheses",
                                     nameof(sequence));
-                            case '}':
+                            case '>':
                                 throw new ArgumentException("Closing brace without opening brace",
                                     nameof(sequence));
                             default:
@@ -84,7 +84,7 @@ namespace Divverence.MarbleTesting
                                 timeOffset = -groupTime;
                                 unOrderedGroupMarbles.Add(character.ToString());
                                 break;
-                            case '}':
+                            case '>':
                                 if (unOrderedGroupMarbles.Count <= 1)
                                 {
                                     throw new ArgumentException("Only groups with multiple marbles are allowed", nameof(sequence));
@@ -93,7 +93,7 @@ namespace Divverence.MarbleTesting
                                 unOrderedGroupMarbles = null;
                                 parsingState = ParsingState.NotInGroup;
                                 break;
-                            case '{':
+                            case '<':
                                 throw new ArgumentException("Cannot have braces nested in an unordered group", nameof(sequence));
                             case '(':
                                 throw new ArgumentException("Cannot have parentheses nested in an unordered group", nameof(sequence));
@@ -128,9 +128,9 @@ namespace Divverence.MarbleTesting
                                 groupMarbles = null;
                                 parsingState = ParsingState.NotInGroup;
                                 break;
-                            case '{':
+                            case '<':
                                 throw new ArgumentException("Cannot have braces nested in an ordered group", nameof(sequence));
-                            case '}':
+                            case '>':
                                 throw new ArgumentException("Cannot have braces nested in an ordered group", nameof(sequence));
                             default:
                                 groupMarbles.Add(character.ToString());

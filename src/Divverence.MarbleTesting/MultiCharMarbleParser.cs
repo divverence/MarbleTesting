@@ -60,7 +60,7 @@ namespace Divverence.MarbleTesting
                             parsingState = ParsingState.InOrderedGroup;
                             groupMarbles = new List<string>();
                             break;
-                        case '{':
+                        case '<':
                             FlushMarble(marbleBuilder, retVal, marbleTime, time);
                             groupTime = time;
                             parsingState = ParsingState.InUnorderedGroup;
@@ -69,7 +69,7 @@ namespace Divverence.MarbleTesting
                         case ')':
                             throw new ArgumentException("Closing parentheses without opening parentheses",
                                 nameof(sequence));
-                        case '}':
+                        case '>':
                             throw new ArgumentException("Closing brace without opening brace",
                                 nameof(sequence));
                         case ',':
@@ -134,7 +134,7 @@ namespace Divverence.MarbleTesting
                             timeOffset = -groupTime;
                             unorderedGroupMarbles.Add(character.ToString());
                             break;
-                        case '}':
+                        case '>':
                             FlushMarbleToGroup(marbleBuilder, unorderedGroupMarbles);
                             if (unorderedGroupMarbles.Count <= 1)
                             {
@@ -145,7 +145,7 @@ namespace Divverence.MarbleTesting
                             parsingState = ParsingState.NotInGroup;
                             AddEmptyMoments(retVal, time + 1);
                             break;
-                        case '{':
+                        case '<':
                             throw new ArgumentException("Cannot have braces nested in an unordered group", nameof(sequence));
                         case '(':
                             throw new ArgumentException("Cannot have parentheses nested in an unordered group", nameof(sequence));

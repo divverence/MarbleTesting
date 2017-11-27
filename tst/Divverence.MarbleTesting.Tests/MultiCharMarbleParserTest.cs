@@ -35,10 +35,10 @@ namespace Divverence.MarbleTesting.Tests
         }
 
         [Theory]
-        [InlineData("{{")]
-        [InlineData("{}}")]
-        [InlineData("}")]
-        [InlineData("{")]
+        [InlineData("<<")]
+        [InlineData("<>>")]
+        [InlineData(">")]
+        [InlineData("<")]
         public void Should_throw_ArgumentException_when_passing_wrong_braces(string marbleLine)
         {
             Action parsingNull = () => MultiCharMarbleParser.ParseSequence(marbleLine);
@@ -46,13 +46,13 @@ namespace Divverence.MarbleTesting.Tests
         }
 
         [Theory]
-        [InlineData("{a}")]
+        [InlineData("<a>")]
         [InlineData("(a)")]
-        [InlineData("x{a}")]
+        [InlineData("x<a>")]
         [InlineData("(a)x")]
-        [InlineData("{}")]
+        [InlineData("<>")]
         [InlineData("()")]
-        [InlineData("x{}")]
+        [InlineData("x<>")]
         [InlineData("()x")]
         public void Should_throw_ArgumentException_when_having_single_element_or_empty_groups(string marbleLine)
         {
@@ -61,9 +61,9 @@ namespace Divverence.MarbleTesting.Tests
         }
 
         [Theory]
-        [InlineData("{{}}")]
-        [InlineData("{()}")]
-        [InlineData("({})")]
+        [InlineData("<<>>")]
+        [InlineData("<()>")]
+        [InlineData("(<>)")]
         public void Should_throw_ArgumentException_when_nesting_groups_braces(string marbleLine)
         {
             Action parsingNull = () => MultiCharMarbleParser.ParseSequence(marbleLine);
@@ -76,10 +76,10 @@ namespace Divverence.MarbleTesting.Tests
         [InlineData("(^)(^)")]
         [InlineData("^(^)")]
         [InlineData("(^^)")]
-        [InlineData("{^}^")]
-        [InlineData("{^}{^}")]
-        [InlineData("^{^}")]
-        [InlineData("{^^}")]
+        [InlineData("<^>^")]
+        [InlineData("<^><^>")]
+        [InlineData("^<^>")]
+        [InlineData("<^^>")]
         [InlineData("^abc^")]
         public void Should_throw_ArgumentException_when_passing_two_starters(string marbleLine)
         {
@@ -93,11 +93,11 @@ namespace Divverence.MarbleTesting.Tests
         [InlineData("(^-)")]
         [InlineData("(ab-)")]
         [InlineData("ab(-b)")]
-        [InlineData("{-}")]
-        [InlineData("{-^}")]
-        [InlineData("{^-}")]
-        [InlineData("{ab-}")]
-        [InlineData("ab{-b}")]
+        [InlineData("<->")]
+        [InlineData("<-^>")]
+        [InlineData("<^->")]
+        [InlineData("<ab->")]
+        [InlineData("ab<-b>")]
         public void Should_throw_ArgumentException_when_passing_dash_in_group(string marbleLine)
         {
             Action parsingNull = () => MultiCharMarbleParser.ParseSequence(marbleLine);
@@ -109,7 +109,7 @@ namespace Divverence.MarbleTesting.Tests
         [InlineData("a,b")]
         [InlineData(",a-,a")]
         [InlineData("(a,b),")]
-        [InlineData("{a,b},")]
+        [InlineData("<a,b>,")]
         public void Should_throw_ArgumentException_when_passing_comma_outside_group(string marbleLine)
         {
             Action parsingNull = () => MultiCharMarbleParser.ParseSequence(marbleLine);
@@ -143,7 +143,7 @@ namespace Divverence.MarbleTesting.Tests
 
         [Theory]
         [InlineData("a-(c1^d1)-f")]
-        [InlineData("a-{c1^d1}-f")]
+        [InlineData("a-<c1^d1>-f")]
         public void Should_take_moment_of_group_start_as_0_time(string inputSequence)
         {
             var actual = MultiCharMarbleParser.ParseSequence(inputSequence);
@@ -154,13 +154,13 @@ namespace Divverence.MarbleTesting.Tests
         [Theory]
         [InlineData("(cx dx)", "cx", "dx")]
         [InlineData("(cx, dx)", "cx", "dx")]
-        [InlineData("{cx dx}", "cx", "dx")]
-        [InlineData("{cx, dx}", "cx", "dx")]
+        [InlineData("<cx dx>", "cx", "dx")]
+        [InlineData("<cx, dx>", "cx", "dx")]
         [InlineData("(cx,dx)", "cx", "dx")]
-        [InlineData("{cx,dx}", "cx", "dx")]
+        [InlineData("<cx,dx>", "cx", "dx")]
         [InlineData("(cx dx, ex)", "cx", "dx", "ex")]
-        [InlineData("{cx, dx ex}", "cx", "dx", "ex")]
-        [InlineData("{cx^ex}", "cx", "^", "ex")]
+        [InlineData("<cx, dx ex>", "cx", "dx", "ex")]
+        [InlineData("<cx^ex>", "cx", "^", "ex")]
         [InlineData("(cx^ex)", "cx", "^", "ex")]
         [InlineData("(cx ^ ex)", "cx", "^", "ex")]
         [InlineData("(cx, ^ ex)", "cx", "^", "ex")]
@@ -175,7 +175,7 @@ namespace Divverence.MarbleTesting.Tests
 
         [Theory]
         [InlineData("a-(cx dx)-f")]
-        [InlineData("a-{cx dx}-f")]
+        [InlineData("a-<cx dx>-f")]
         public void Supports_group_in_middle(string sequence)
         {
             var actual = MultiCharMarbleParser.ParseSequence(sequence);
@@ -187,13 +187,13 @@ namespace Divverence.MarbleTesting.Tests
 
         [Theory]
         [InlineData("a-(c,d)e-(g,h)", "a", "", "c+d", "", "", "", "", "e", "", "g+h", "", "", "", "")]
-        [InlineData("a-{c,d}e-{g,h}", "a", "", "c+d", "", "", "", "", "e", "", "g+h", "", "", "", "")]
+        [InlineData("a-<c,d>e-<g,h>", "a", "", "c+d", "", "", "", "", "e", "", "g+h", "", "", "", "")]
         [InlineData("(c,d)e", "c+d", "", "", "", "", "e")]
-        [InlineData("{c,d}e", "c+d", "", "", "", "", "e")]
+        [InlineData("<c,d>e", "c+d", "", "", "", "", "e")]
         [InlineData("c (d e)", "c", "", "d+e", "", "", "", "")]
         [InlineData("c(d e)", "c", "d+e", "", "", "", "")]
-        [InlineData("c {d e}", "c", "", "d+e", "", "", "", "")]
-        [InlineData("c{d e}", "c", "d+e", "", "", "", "")]
+        [InlineData("c <d e>", "c", "", "d+e", "", "", "", "")]
+        [InlineData("c<d e>", "c", "d+e", "", "", "", "")]
         public void Supports_multiple_groups(string sequence, params string[] flattenedMoments)
         {
             var actual = MultiCharMarbleParser.ParseSequence(sequence);
