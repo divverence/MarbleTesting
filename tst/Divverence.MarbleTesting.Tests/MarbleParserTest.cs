@@ -77,8 +77,8 @@ namespace Divverence.MarbleTesting.Tests
         [InlineData("(^^)")]
         [InlineData("{^}^")]
         [InlineData("{^}{^}")]
-        [InlineData("^{^)")]
-        [InlineData("{^^)")]
+        [InlineData("^{^}")]
+        [InlineData("{^^}")]
         [InlineData("^abc^")]
         public void Should_throw_ArgumentException_when_passing_two_starters(string marbleLine)
         {

@@ -10,7 +10,7 @@ namespace Divverence.MarbleTesting
         {
             NotInGroup,
             InOrderedGroup,
-            InUnOrderedGroup
+            InUnorderedGroup
         }
 
         public static IEnumerable<Moment> ParseSequence(string sequence)
@@ -57,7 +57,7 @@ namespace Divverence.MarbleTesting
                                 break;
                             case '{':
                                 groupTime = time;
-                                parsingState = ParsingState.InUnOrderedGroup;
+                                parsingState = ParsingState.InUnorderedGroup;
                                 unOrderedGroupMarbles = new List<string>();
                                 break;
                             case ')':
@@ -71,7 +71,7 @@ namespace Divverence.MarbleTesting
                                 break;
                         }
                         break;
-                    case ParsingState.InUnOrderedGroup:
+                    case ParsingState.InUnorderedGroup:
                         switch (character)
                         {
                             case ' ':
@@ -142,7 +142,7 @@ namespace Divverence.MarbleTesting
             }
             if (parsingState == ParsingState.InOrderedGroup)
                 throw new ArgumentException("Opening parentheses without closing parentheses", nameof(sequence));
-            if (parsingState == ParsingState.InUnOrderedGroup)
+            if (parsingState == ParsingState.InUnorderedGroup)
                 throw new ArgumentException("Opening brace without closing brace", nameof(sequence));
             return retVal;
         }
