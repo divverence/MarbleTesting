@@ -46,6 +46,19 @@ namespace Divverence.MarbleTesting.Akka.Tests
             var marbleTest = SetupMarbleTest(
                 "ab---------j",
                 "a<bcdefghi>j",
+                false,
+                inputMappings);
+            await marbleTest.Run();
+        }
+
+        [Theory]
+        [MemberData(nameof(UnorderedGroupTestInput))]
+        public async Task Should_handle_unordered_group_as_unordered_for_multi_char_parser(params (string Key, string[] ToSend)[] inputMappings)
+        {
+            var marbleTest = SetupMarbleTest(
+                "a-b-----------------j",
+                "a-<b c d e f g h i>-j",
+                true,
                 inputMappings);
             await marbleTest.Run();
         }
@@ -67,17 +80,19 @@ namespace Divverence.MarbleTesting.Akka.Tests
             var marbleTest = SetupMarbleTest(
                 "ab---d",
                 "a<bc>d",
+                false,
                 inputMappings);
             var actual = await Assert.ThrowsAsync<Exception>(() => marbleTest.Run());
             Assert.NotNull(actual.InnerException);
         }
 
-        private AkkaMarbleTest SetupMarbleTest(string inputSequence, string expectedOutputSequence, params (string Key, string[] ToSend)[] inputMappings)
+        private AkkaMarbleTest SetupMarbleTest(string inputSequence, string expectedOutputSequence, bool useMultiCharParser, params (string Key, string[] ToSend)[] inputMappings)
         {
             var inputMapping = inputMappings.ToDictionary(valueTuple => valueTuple.Key, valueTuple => valueTuple.ToSend);
             var testProbe = CreateTestProbe(Sys, "OutputProbe");
             var mapperActor = Sys.ActorOf(MapperActor.Props(inputMapping, testProbe), "Mapper");
-            var marbleTest = new AkkaMarbleTest(Sys);
+            IEnumerable<Moment> ParserFunc(string s) => useMultiCharParser ? MultiCharMarbleParser.ParseSequence(s) : MarbleParser.ParseSequence(s);
+            var marbleTest = new AkkaMarbleTest(Sys, ParserFunc);
             marbleTest.WhenTelling(
                 inputSequence, mapperActor, s => s);
             marbleTest.ExpectMsgs<string>(
