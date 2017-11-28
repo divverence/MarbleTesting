@@ -208,7 +208,7 @@ namespace Divverence.MarbleTesting.Akka
         private static IEnumerable<Exception> NonNullFailures(IEnumerable<ExpectationResult> failedMarbles) => failedMarbles.Where(m => m.Failure != null).Select(r => r.Failure);
 
         private static string FormatMarblesInUnorderedGroup(IEnumerable<string> marbles) =>
-            $"{{ {string.Join(" ", marbles)} }}";
+            $"< {string.Join(" ", marbles)} >";
 
         private static string BuildAssertionsMessage(IEnumerable<ExpectationResult> failedMarbles)
         {
