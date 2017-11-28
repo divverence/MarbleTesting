@@ -22,7 +22,7 @@ namespace Divverence.MarbleTesting
             var moments = ParseSequence(sequence, out timeOffset);
             if (!timeOffset.HasValue || timeOffset.Value == 0)
                 return moments;
-            return moments.Select(m => new Moment(m.Time + timeOffset.Value, m.Marbles));
+            return moments.Select(m => new Moment(m.Time + timeOffset.Value, m.Marbles, m.IsOrderedGroup));
         }
 
         private static IEnumerable<Moment> ParseSequence(string sequence, out int? timeOffset)
@@ -140,7 +140,7 @@ namespace Divverence.MarbleTesting
                             {
                                 throw new ArgumentException("Only groups with multiple marbles are allowed", nameof(sequence));
                             }
-                            retVal.Add(new Moment(groupTime, unorderedGroupMarbles.ToArray()));
+                            retVal.Add(new Moment(groupTime, unorderedGroupMarbles.ToArray(), false));
                             unorderedGroupMarbles = null;
                             parsingState = ParsingState.NotInGroup;
                             AddEmptyMoments(retVal, time + 1);
