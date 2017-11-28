@@ -35,8 +35,8 @@ namespace Divverence.MarbleTesting.Akka.Tests
 
         public static IEnumerable<object[]> UnorderedGroupTestInput()
         {
-            yield return new object[] { ("a", new[] { "a" }), ("b", new[] { "c", "b" }), ("d", new[] { "d" }) };
-            yield return new object[] { ("a", new[] { "a" }), ("b", new[] { "b", "c" }), ("d", new[] { "d" }) };
+            yield return new object[] { ("a", new[] { "a" }), ("b", new[] { "c", "b", "e", "f", "d", "g", "i", "h" }), ("j", new[] { "j" }) };
+            yield return new object[] { ("a", new[] { "a" }), ("b", new[] { "b", "c", "i", "d", "g", "f", "h", "e" }), ("j", new[] { "j" }) };
         }
 
         [Theory]
@@ -44,8 +44,8 @@ namespace Divverence.MarbleTesting.Akka.Tests
         public async Task Should_handle_unordered_group_as_unordered(params (string Key, string[] ToSend)[] inputMappings)
         {
             var marbleTest = SetupMarbleTest(
-                "ab---d",
-                "a<bc>d",
+                "ab---------j",
+                "a<bcdefghi>j",
                 inputMappings);
             await marbleTest.Run();
         }
