@@ -21,7 +21,7 @@ namespace Divverence.MarbleTesting
             var moments = ParseSequence(sequence, out timeOffset);
             if (!timeOffset.HasValue || timeOffset.Value == 0)
                 return moments;
-            return moments.Select(m => new Moment(m.Time + timeOffset.Value, m.Marbles));
+            return moments.Select(m => new Moment(m.Time + timeOffset.Value, m.Marbles, m.IsOrderedGroup));
         }
 
         private static IEnumerable<Moment> ParseSequence(string sequence, out int? timeOffset)

@@ -134,6 +134,18 @@ namespace Divverence.MarbleTesting.Tests
             actual.Select(m => m.Time).Should().Equal(-2, -1, 0, 5, 6);
         }
 
+        [Theory]
+        [InlineData("a-(c^d)-f", true)]
+        [InlineData("a-<c^d>-f", false)]
+        public void Should_take_moment_of_group_start_as_0_time(string inputSequence, bool isOrderedGroup)
+        {
+            var actual = MarbleParser.ParseSequence(inputSequence);
+            actual.First().Time.Should().Be(-2);
+            var moment = actual.Skip(2).First();
+            moment.IsOrderedGroup.Should().Be(isOrderedGroup);
+            moment.Time.Should().Be(0);
+        }
+
         [Fact]
         public void Supports_group_in_middle()
         {
