@@ -42,6 +42,7 @@
     <Compile Include="Async\AsyncTestKitHelper.cs" />
     <Compile Include="Async\AwaitableTaskDispatcher.cs" />
     <Compile Include="Async\AwaitableTaskDispatcherConfigurator.cs" />
+    <Compile Include="Async\AwaitableTaskDispatcherRelatedExtensions.cs" />
     <Compile Include="Async\ConfigExtensionsForAsyncTesting.cs" />
     <Compile Include="Async\IWaitForIdleOrActive.cs" />
     <Compile Include="Async\MultiDispatcherAwaiter.cs" />
