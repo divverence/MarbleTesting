@@ -107,7 +107,7 @@ namespace Divverence.MarbleTesting.Akka
             return moment.Marbles
                 .Select(
                     marble =>
-                        new ExpectedMarble(moment.Time, marble, () => probe.ExpectMsg<T>(t => predicate(marble, t))))
+                        new ExpectedMarble(moment.Time, marble, () => probe.ExpectMsg<T>(t => predicate(marble, t), TimeSpan.Zero)))
                 .Concat(Enumerable.Repeat(new ExpectedMarble(moment.Time, null, () => probe.ExpectNoMsg(0)), 1));
         }
 
@@ -167,8 +167,8 @@ namespace Divverence.MarbleTesting.Akka
                                 $"'{FormatMarblesInUnorderedGroup(marblesReceived)}' " +
                                 $"{BuildAssertionsMessage(failedMarbles)}.", NonNullFailures(failedMarbles));
                         }
-                    });
-
+                    },
+                    TimeSpan.Zero);
                 }
                 catch (Exception e) when (e.Message.Contains("Timeout"))
                 {
@@ -190,7 +190,8 @@ namespace Divverence.MarbleTesting.Akka
                         expectionGenerator,
                         expectationResults,
                         n);
-                });
+                },
+                TimeSpan.Zero);
             }
             catch (Exception e) when (e.Message.Contains("Timeout"))
             {
