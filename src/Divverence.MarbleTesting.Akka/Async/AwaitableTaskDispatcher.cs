@@ -56,6 +56,12 @@ namespace Divverence.MarbleTesting.Akka.Async
         {
         }
 
+        public void PoolTask(Task task)
+        {
+            _tasks.Add(task);
+            _activeTcs.TrySetResult(true);
+        }
+
         protected override void ExecuteTask(IRunnable run)
         {
             _tasks.Add(Task.Run(() => run.Run()));
