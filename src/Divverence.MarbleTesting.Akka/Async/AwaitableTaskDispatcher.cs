@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,16 +57,49 @@ namespace Divverence.MarbleTesting.Akka.Async
         {
         }
 
-        public void PoolTask(Task task)
+        public Task TrackTask(Task task)
         {
             _tasks.Add(task);
             _activeTcs.TrySetResult(true);
+            return task;
+        }
+
+        public Task<T> TrackTask<T>(Task<T> task)
+        {
+            _tasks.Add(task);
+            _activeTcs.TrySetResult(true);
+            return task;
+        }
+
+        public Task<T> RunAsync<T>(Func<T> task)
+        {
+            var tcs = new TaskCompletionSource<T>();
+            var t1 = Task.Run(() =>
+           {
+               try
+               {
+                   var result = task();
+                   tcs.SetResult(result);
+               }
+               catch (Exception e)
+               {
+                   tcs.SetException(e);
+               }
+           }
+           );
+
+            TrackTask(t1);
+            return TrackTask(tcs.Task);
+        }
+
+        public Task RunAsync(Action action)
+        {
+            return TrackTask(Task.Run(() => action()));
         }
 
         protected override void ExecuteTask(IRunnable run)
         {
-            _tasks.Add(Task.Run(() => run.Run()));
-            _activeTcs.TrySetResult(true);
+            RunAsync(run.Run);
         }
 
         protected override void Shutdown()

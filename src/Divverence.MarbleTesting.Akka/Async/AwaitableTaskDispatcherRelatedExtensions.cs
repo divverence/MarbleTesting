@@ -7,8 +7,12 @@ namespace Divverence.MarbleTesting.Akka.Async
     {
         public static Task TrackOnDispatcher(this Task task, AwaitableTaskDispatcher dispatcherOrNull)
         {
-            dispatcherOrNull?.PoolTask(task);
-            return task;
+            return dispatcherOrNull?.TrackTask(task) ?? task;
+        }
+
+        public static Task<T> TrackOnDispatcher<T>(this Task<T> task, AwaitableTaskDispatcher dispatcherOrNull)
+        {
+            return dispatcherOrNull?.TrackTask(task) ?? task;
         }
 
         public static Task TrackOnDispatcher(this Task task, IActorContext context) => task.TrackOnDispatcher(context.Dispatcher as AwaitableTaskDispatcher);
