@@ -125,7 +125,7 @@ namespace Divverence.MarbleTesting.Akka
             return moment.Marbles
                 .Select(
                     marble =>
-                        new ExpectedMarble(moment.Time, marble, () => probe.ExpectMsg(assertionFactory(marble))))
+                        new ExpectedMarble(moment.Time, marble, () => probe.ExpectMsg(assertionFactory(marble), TimeSpan.Zero)))
                 .Concat(Enumerable.Repeat(new ExpectedMarble(moment.Time, null, () => probe.ExpectNoMsg(0)), 1));
         }
 
