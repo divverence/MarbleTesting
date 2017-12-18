@@ -21,9 +21,9 @@
   <ItemGroup>
   </ItemGroup>
 
-  <!-- EMBED SOURCES
+  <!-- EMBED SOURCES -->
   <ItemGroup>
     <EmbeddedFiles Include="@(Compile)" />
-  </ItemGroup> -->
+  </ItemGroup>
 
 </Project>

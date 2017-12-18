@@ -22,9 +22,9 @@
     <ProjectReference Include="..\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj" />
   </ItemGroup>
 
-  <!-- EMBED SOURCES
+  <!-- EMBED SOURCES -->
   <ItemGroup>
     <EmbeddedFiles Include="@(Compile)" />
-  </ItemGroup> -->
+  </ItemGroup>
 
 </Project>
