@@ -13,7 +13,6 @@
 
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
   </ItemGroup>
 
   <!-- *REF PROJECTS* -->
