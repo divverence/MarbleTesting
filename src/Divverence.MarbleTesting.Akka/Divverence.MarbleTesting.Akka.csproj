@@ -2,12 +2,8 @@
 
   <!-- BUILD -->
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
-  <!-- *DESCRIPTION* -->
-  <PropertyGroup>
     <Description>Divverence.MarbleTesting Library for Akka.Net</Description>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <!-- *REF NUGET PACKAGES* -->
@@ -20,12 +16,9 @@
     <ProjectReference Include="..\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj" />
   </ItemGroup>
 
-  <!-- Divverence.Gear.Configuration -->
+  <!-- EMBED SOURCES
   <ItemGroup>
-    <ConfigurationFiles Include="etc\**\*.properties" />
-  </ItemGroup>
-  <Target Name="MyAfterBuild" AfterTargets="Build">
-    <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles->'$(OutDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
-  </Target>
+    <EmbeddedFiles Include="@(Compile)" />
+  </ItemGroup> -->
 
 </Project>
