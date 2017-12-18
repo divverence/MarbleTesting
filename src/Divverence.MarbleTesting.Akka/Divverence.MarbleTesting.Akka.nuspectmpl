@@ -13,6 +13,6 @@
     <copyright>Copyright 2016 Divverence B.V.</copyright>
   </metadata>
   <files>
-    <file src="..\..\built\Divverence.MarbleTesting.Akka\Divverence.MarbleTesting.Akka.pdb" target="lib\net452" />
+    <file src="..\..\built\Divverence.MarbleTesting.Akka\bin\Divverence.MarbleTesting.Akka.pdb" target="lib\net452" />
   </files>
 </package>
