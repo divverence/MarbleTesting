@@ -3,7 +3,7 @@
   <!-- BUILD -->
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <!-- *SPECIFICS* -->
