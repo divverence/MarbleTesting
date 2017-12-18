@@ -2,6 +2,12 @@
 
   <!-- BUILD -->
   <PropertyGroup>
+    <TargetFramework>net452</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <!-- *SPECIFICS* -->
+  <PropertyGroup>
     <Description>Divverence.MarbleTesting Library for Akka.Net</Description>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
