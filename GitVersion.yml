@@ -1,5 +1,5 @@
 assembly-versioning-scheme: MajorMinorPatchTag
-mode: ContinuousDeployment
+mode: ContinuousDelivery
 branches:
   dev(elop)?(ment)?$:
     tag: dev
