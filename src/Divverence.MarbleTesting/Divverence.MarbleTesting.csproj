@@ -16,10 +16,6 @@
      <Authors>Divverence B.V.</Authors>
    <PackageIconUrl>http://www.divverence.com/favicon.ico</PackageIconUrl>
   </PropertyGroup>
-  <ItemGroup>
-    <EmbeddedFiles Include="@(Compile);@(AdditionalFiles)" />
-    <Compile Include="..\..\built\SharedAssemblyInfo*.cs" Link="SharedAssemblyInfo.cs" />
-  </ItemGroup>
 
   <!-- *DESCRIPTION* -->
   <PropertyGroup>
