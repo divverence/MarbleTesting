@@ -5,12 +5,6 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <!-- PACKAGE AND VERSION CREATION -->
-  <ItemGroup>
-    <EmbeddedFiles Include="@(Compile);@(AdditionalFiles)" />
-    <Compile Include="..\..\built\SharedAssemblyInfo*.cs" Link="SharedAssemblyInfo.cs" />
-  </ItemGroup>
-
   <!-- *DESCRIPTION* -->
   <PropertyGroup>
     <Description>Divverence.MarbleTesting Library for Akka.Net</Description>
