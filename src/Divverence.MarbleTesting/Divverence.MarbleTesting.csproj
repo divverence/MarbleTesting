@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!-- BUILD -->
@@ -12,12 +13,20 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
+  <!-- *REF FRAMEWORK* -->
+  <ItemGroup>
+  </ItemGroup>
+
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
   </ItemGroup>
 
   <!-- *REF PROJECTS* -->
+  <ItemGroup>
+  </ItemGroup>
+
+  <!-- *EMBEDDED RESOURCES* -->
   <ItemGroup>
   </ItemGroup>
 

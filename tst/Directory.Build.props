@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
 
   <!-- Give below packages a context -->
@@ -9,8 +10,8 @@
   <!-- Standard Unit Test Packages -->
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="4.19.4" />
-    <PackageReference Include="xunit" Version="2.3.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>
 
 </Project>
