@@ -5,7 +5,7 @@
   <!-- Note that the actual .csproj will have to contain these (and the same values!) as well -->
   <!-- Also note that the top level directory Directory.Build.props is *not* also included -->
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
