@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Xunit;
@@ -34,11 +35,51 @@ namespace Divverence.MarbleTesting.Tests
         }
 
         [Theory]
+        [InlineData("<<")]
+        [InlineData("<>>")]
+        [InlineData(">")]
+        [InlineData("<")]
+        public void Should_throw_ArgumentException_when_passing_wrong_braces(string marbleLine)
+        {
+            Action parsingNull = () => MultiCharMarbleParser.ParseSequence(marbleLine);
+            parsingNull.ShouldThrow<ArgumentException>();
+        }
+
+        [Theory]
+        [InlineData("<a>")]
+        [InlineData("(a)")]
+        [InlineData("x<a>")]
+        [InlineData("(a)x")]
+        [InlineData("<>")]
+        [InlineData("()")]
+        [InlineData("x<>")]
+        [InlineData("()x")]
+        public void Should_throw_ArgumentException_when_having_single_element_or_empty_groups(string marbleLine)
+        {
+            Action parsingNull = () => MultiCharMarbleParser.ParseSequence(marbleLine);
+            parsingNull.ShouldThrow<ArgumentException>();
+        }
+
+        [Theory]
+        [InlineData("<<>>")]
+        [InlineData("<()>")]
+        [InlineData("(<>)")]
+        public void Should_throw_ArgumentException_when_nesting_groups_braces(string marbleLine)
+        {
+            Action parsingNull = () => MultiCharMarbleParser.ParseSequence(marbleLine);
+            parsingNull.ShouldThrow<ArgumentException>();
+        }
+
+        [Theory]
         [InlineData("^^")]
         [InlineData("(^)^")]
         [InlineData("(^)(^)")]
         [InlineData("^(^)")]
         [InlineData("(^^)")]
+        [InlineData("<^>^")]
+        [InlineData("<^><^>")]
+        [InlineData("^<^>")]
+        [InlineData("<^^>")]
         [InlineData("^abc^")]
         public void Should_throw_ArgumentException_when_passing_two_starters(string marbleLine)
         {
@@ -52,6 +93,11 @@ namespace Divverence.MarbleTesting.Tests
         [InlineData("(^-)")]
         [InlineData("(ab-)")]
         [InlineData("ab(-b)")]
+        [InlineData("<->")]
+        [InlineData("<-^>")]
+        [InlineData("<^->")]
+        [InlineData("<ab->")]
+        [InlineData("ab<-b>")]
         public void Should_throw_ArgumentException_when_passing_dash_in_group(string marbleLine)
         {
             Action parsingNull = () => MultiCharMarbleParser.ParseSequence(marbleLine);
@@ -63,6 +109,7 @@ namespace Divverence.MarbleTesting.Tests
         [InlineData("a,b")]
         [InlineData(",a-,a")]
         [InlineData("(a,b),")]
+        [InlineData("<a,b>,")]
         public void Should_throw_ArgumentException_when_passing_comma_outside_group(string marbleLine)
         {
             Action parsingNull = () => MultiCharMarbleParser.ParseSequence(marbleLine);
@@ -94,66 +141,45 @@ namespace Divverence.MarbleTesting.Tests
             actual.Skip(3).First().Marbles.Should().Equal("^");
         }
 
-        [Fact]
-        public void Should_take_moment_of_group_start_as_0_time()
+        [Theory]
+        [InlineData("a-(c1^d1)-f", true)]
+        [InlineData("a-<c1^d1>-f", false)]
+        public void Should_take_moment_of_group_start_as_0_time(string inputSequence, bool isOrderedGroup)
         {
-            var actual = MultiCharMarbleParser.ParseSequence("a-(c1^d1)-f");
+            var actual = MultiCharMarbleParser.ParseSequence(inputSequence);
             actual.First().Time.Should().Be(-2);
-            actual.Skip(2).First().Time.Should().Be(0);
+            var moment = actual.Skip(2).First();
+            moment.IsOrderedGroup.Should().Be(isOrderedGroup);
+            moment.Time.Should().Be(0);
         }
 
-        [Fact]
-        public void Supports_space_separated_group()
+        [Theory]
+        [InlineData("(cx dx)", "cx", "dx")]
+        [InlineData("(cx, dx)", "cx", "dx")]
+        [InlineData("<cx dx>", "cx", "dx")]
+        [InlineData("<cx, dx>", "cx", "dx")]
+        [InlineData("(cx,dx)", "cx", "dx")]
+        [InlineData("<cx,dx>", "cx", "dx")]
+        [InlineData("(cx dx, ex)", "cx", "dx", "ex")]
+        [InlineData("<cx, dx ex>", "cx", "dx", "ex")]
+        [InlineData("<cx^ex>", "cx", "^", "ex")]
+        [InlineData("(cx^ex)", "cx", "^", "ex")]
+        [InlineData("(cx ^ ex)", "cx", "^", "ex")]
+        [InlineData("(cx, ^ ex)", "cx", "^", "ex")]
+        [InlineData("(cx^ ex)", "cx", "^", "ex")]
+        [InlineData("(^cx ex)", "^", "cx", "ex")]
+        [InlineData("(^ cx ex)", "^", "cx", "ex")]
+        public void Supports_space_comma_and_circumflex_separated_groups(string sequence, params string[] expectedMarbles)
         {
-            var sequence = "(cx dx)";
             var actual = MultiCharMarbleParser.ParseSequence(sequence);
-            actual.First().Marbles.Should().Equal("cx","dx");
+            actual.First().Marbles.Should().Equal(expectedMarbles);
         }
 
-        [Fact]
-        public void Supports_comma_separated_group()
+        [Theory]
+        [InlineData("a-(cx dx)-f")]
+        [InlineData("a-<cx dx>-f")]
+        public void Supports_group_in_middle(string sequence)
         {
-            var sequence = "(cx,dx)";
-            var actual = MultiCharMarbleParser.ParseSequence(sequence);
-            actual.First().Marbles.Should().Equal("cx", "dx");
-        }
-
-        [Fact]
-        public void Supports_comma_space_separated_group()
-        {
-            var sequence = "(cx, dx)";
-            var actual = MultiCharMarbleParser.ParseSequence(sequence);
-            actual.First().Marbles.Should().Equal("cx", "dx");
-        }
-
-        [Fact]
-        public void Supports_space_and_comma_separated_group()
-        {
-            var sequence = "(cx,dx ex)";
-            var actual = MultiCharMarbleParser.ParseSequence(sequence);
-            actual.First().Marbles.Should().Equal("cx", "dx", "ex");
-        }
-
-        [Fact]
-        public void Supports_circumflex_separated_group()
-        {
-            var sequence = "(cx^dx)";
-            var actual = MultiCharMarbleParser.ParseSequence(sequence);
-            actual.First().Marbles.Should().Equal("cx", "^", "dx");
-        }
-
-        [Fact]
-        public void Supports_circumflex_and_space_separated_group()
-        {
-            var sequence = "(^ cx dx)";
-            var actual = MultiCharMarbleParser.ParseSequence(sequence);
-            actual.First().Marbles.Should().Equal("^", "cx", "dx");
-        }
-
-        [Fact]
-        public void Supports_group_in_middle()
-        {
-            var sequence = "a-(cx dx)-f";
             var actual = MultiCharMarbleParser.ParseSequence(sequence);
             actual.Take(3).Select(m => string.Join("+", m.Marbles)).Should().Equal("a", "", "cx+dx");
             actual.Take(3).Select(m => m.Time).Should().Equal(0, 1, 2);
@@ -161,28 +187,20 @@ namespace Divverence.MarbleTesting.Tests
             actual.Last().Time.Should().Be(sequence.Length - 1);
         }
 
-        [Fact]
-        public void Supports_multiple_groups()
+        [Theory]
+        [InlineData("a-(c,d)e-(g,h)", "a", "", "c+d", "", "", "", "", "e", "", "g+h", "", "", "", "")]
+        [InlineData("a-<c,d>e-<g,h>", "a", "", "c+d", "", "", "", "", "e", "", "g+h", "", "", "", "")]
+        [InlineData("(c,d)e", "c+d", "", "", "", "", "e")]
+        [InlineData("<c,d>e", "c+d", "", "", "", "", "e")]
+        [InlineData("c (d e)", "c", "", "d+e", "", "", "", "")]
+        [InlineData("c(d e)", "c", "d+e", "", "", "", "")]
+        [InlineData("c <d e>", "c", "", "d+e", "", "", "", "")]
+        [InlineData("c<d e>", "c", "d+e", "", "", "", "")]
+        public void Supports_multiple_groups(string sequence, params string[] flattenedMoments)
         {
-            var actual = MultiCharMarbleParser.ParseSequence("a-(c,d)e-(g,h)");
-            actual.Select(m => m.Time).Should().Equal(Enumerable.Range(0, 14));
-            actual.Select(m => string.Join("+",m.Marbles)).Should().Equal("a", "", "c+d", "", "", "", "", "e", "", "g+h", "", "", "", "");
-        }
-
-        [Fact]
-        public void Supports_group_at_start()
-        {
-            var actual = MultiCharMarbleParser.ParseSequence("(c,d)e");
-            actual.Take(1).Select(m => string.Join("+", m.Marbles)).Should().Equal("c+d");
-            actual.Last().Marbles.Should().Equal("e");
-        }
-
-        [Fact]
-        public void Supports_group_at_end()
-        {
-            var actual = MultiCharMarbleParser.ParseSequence("a(c,d)");
-            actual.Skip(1).First().Marbles.Should().Equal("c", "d");
-            actual.Skip(1).First().Time.Should().Be(1);
+            var actual = MultiCharMarbleParser.ParseSequence(sequence);
+            FlattenMoments(actual).Should().Equal(flattenedMoments);
+            actual.Select(m => m.Time).Should().Equal(Enumerable.Range(0, flattenedMoments.Length));
         }
 
         [Fact]
@@ -256,8 +274,8 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public void Not_leading_or_trailing_spaces_are_equivalent_to_dashes()
         {
-            var actual = MultiCharMarbleParser.ParseSequence("a b  c -  (de)   f-");
-            var expected = MultiCharMarbleParser.ParseSequence("a-b--c----(de)---f-");
+            var actual = MultiCharMarbleParser.ParseSequence("a b  c -  (de gh)   f-");
+            var expected = MultiCharMarbleParser.ParseSequence("a-b--c----(de gh)---f-");
             actual.Select(m => m.Time).Should().Equal(expected.Select(m => m.Time));
             actual.Select(m => string.Join("+", m.Marbles)).Should().Equal(expected.Select(m => string.Join("+", m.Marbles)));
         }
@@ -287,6 +305,11 @@ namespace Divverence.MarbleTesting.Tests
             var expected = MultiCharMarbleParser.ParseSequence("a--b");
             actual.Select(m => m.Time).Should().Equal(expected.Select(m => m.Time));
             actual.Select(m => string.Join("+", m.Marbles)).Should().Equal(expected.Select(m => string.Join("+", m.Marbles)));
+        }
+
+        private static IEnumerable<string> FlattenMoments(IEnumerable<Moment> moments)
+        {
+            return moments.Select(m => string.Join("+", m.Marbles));
         }
     }
 }

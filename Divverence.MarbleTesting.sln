@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting", "Divverence.MarbleTesting\Divverence.MarbleTesting.csproj", "{01C2AA70-2E5D-43D3-ACA9-A79327897777}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting", "src\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj", "{01C2AA70-2E5D-43D3-ACA9-A79327897777}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting.Akka", "Divverence.MarbleTesting.Akka\Divverence.MarbleTesting.Akka.csproj", "{FE0E1FA1-5467-433D-9265-5765C78F25FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting.Akka", "src\Divverence.MarbleTesting.Akka\Divverence.MarbleTesting.Akka.csproj", "{FE0E1FA1-5467-433D-9265-5765C78F25FC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{0C1FEE31-18AB-457C-AE54-C07CA0264DBD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting.Tests", "..\tst\Divverence.MarbleTesting.Tests\Divverence.MarbleTesting.Tests.csproj", "{EA0993D7-891A-44BF-A72A-2231AD6D1350}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting.Tests", "tst\Divverence.MarbleTesting.Tests\Divverence.MarbleTesting.Tests.csproj", "{EA0993D7-891A-44BF-A72A-2231AD6D1350}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting.Akka.Tests", "..\tst\Divverence.MarbleTesting.Akka.Tests\Divverence.MarbleTesting.Akka.Tests.csproj", "{8781CCC0-9D54-478C-8653-CF0626DFA6FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Divverence.MarbleTesting.Akka.Tests", "tst\Divverence.MarbleTesting.Akka.Tests\Divverence.MarbleTesting.Akka.Tests.csproj", "{8781CCC0-9D54-478C-8653-CF0626DFA6FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

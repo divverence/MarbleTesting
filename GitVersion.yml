@@ -2,6 +2,7 @@ assembly-versioning-scheme: MajorMinorPatchTag
 mode: ContinuousDeployment
 branches:
   dev(elop)?(ment)?$:
-    tag: dev
+    tag: zdev
   releases?[/-]:
     tag: rc
+    mode: ContinuousDelivery

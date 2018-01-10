@@ -1,6 +1,6 @@
-# Divverence.MarbleTest.Akka
+# Divverence.MarbleTesting.Akka
 
-Divverence.MarbleTest.Akka is a small library that allows to write tests for [Akka.Net](https://github.com/akkadotnet/akka.net/) actors / systems using marble diagrams in text form.  
+Divverence.MarbleTesting.Akka is a small library that allows to write tests for [Akka.Net](https://github.com/akkadotnet/akka.net/) actors / systems using marble diagrams in text form.  
 This library is inspired by the practice in the Rx / ReactiveStreams world to use [marble diagrams](http://rxmarbles.com/) to describe the (intented) behaviour of operators.
 It's our belief that this concept also applies very nicely to [Actors](https://petabridge.com/blog/akkadotnet-what-is-an-actor/) in an [actor model](https://en.wikipedia.org/wiki/Actor_model).
 Inspiration for this library came from the ideas of [Erik Meijer](https://twitter.com/headinthebox) and the [marble test features](https://github.com/ReactiveX/rxjs/blob/master/doc/writing-marble-tests.md) of RxJS v5.
@@ -11,16 +11,23 @@ For background on Marble Testing in general, check this nice [7 minutes introduc
 
 This library is complementary to [MarbleTest.Net](https://github.com/alexvictoor/MarbleTest.Net), which targets System.Reactive (Rx.Net) specifically. Thanks go out to the autor(s) of that project for ideas and possibly some source code.
 
-## Divverence.MarbleTest.Akka
+## Getting Started
 
 To get the lib just use nuget as below:
+
 ```
-PM> Install-Package Divverence.MarbleTest.Akka
+PM> Install-Package Divverence.MarbleTesting.Akka
 ```
 
 ## Usage
 
 ToDo
+
+## Building
+
+Use dotnet CLI 2.0:
+
+`dotnet build -c Release`
 
 ## Marble Sequence syntax
 
@@ -31,6 +38,7 @@ Each character represents what happens during a moment in virtual time.
 **'a'** or any other non-reserved character means that a message is sent or received at that moment
 
 So in the 'Tell' usage, "X-Y-" means:
+
 - At time '0', a message 'X' is sent
 - At time '1', nothing is sent
 - At time '2', a message 'Y' is sent
@@ -38,6 +46,7 @@ So in the 'Tell' usage, "X-Y-" means:
 - Before and after time '0' and '3', nothing is sent
 
 And in the 'Expect' usage, "X-Y-" means:
+
 - At time '0', a message 'X' should arrive and nothing else
 - At time '1', no message should arrive
 - At time '2', a message 'Y' should arrive and nothing else
@@ -46,10 +55,12 @@ And in the 'Expect' usage, "X-Y-" means:
 - After time '3', no assertions are made about what should happen.
 
 ### Simultaneous messages
+
 If messages should be sent or expected simultaneously, you can group them using paranthesis.  
 So "--(abc)--" means events a, b and c occur at moment 2.  
 
 For a complete description of the syntax, please refer to the [official RxJS documentation](https://github.com/ReactiveX/rxjs/blob/master/doc/writing-marble-tests.md)
 
 ## Supported Test Frameworks
+
 Divverence.MarbleTesting.Akka internally uses the TestKitBase.Expect(No)Msg(s) methods for all assertions, and should therefore work with any of the test frameworks supported by Akka.Net.

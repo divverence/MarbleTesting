@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net452</TargetFramework>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Copyright>Copyright 2015-2018 Divverence B.V.</Copyright>
+    <Authors>Divverence B.V.</Authors>
+    <PackageIconUrl>http://www.divverence.com/favicon.ico</PackageIconUrl>
+  </PropertyGroup>
+
+  <!-- PACKAGE AND VERSION CREATION -->
+  <ItemGroup>
+    <Compile Include="..\..\built\SharedAssemblyInfo*.cs" Link="SharedAssemblyInfo.cs" />
+  </ItemGroup>
+
+  <!-- Divverence.Gear.Configuration -->
+  <ItemGroup>
+    <ConfigurationFiles Include="etc\**\*.properties" />
+  </ItemGroup>
+  <Target Name="MyAfterBuild" AfterTargets="Build">
+    <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles-&gt;'$(OutDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
+  </Target>
+
+</Project>
