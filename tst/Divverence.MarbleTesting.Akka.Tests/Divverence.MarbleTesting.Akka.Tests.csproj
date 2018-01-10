@@ -25,6 +25,7 @@
   <!-- *REF PROJECTS* -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\Divverence.MarbleTesting.Akka\Divverence.MarbleTesting.Akka.csproj" />
+    <ProjectReference Include="..\..\src\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj" />
   </ItemGroup>
 
   <!-- *EMBEDDED RESOURCES* -->
