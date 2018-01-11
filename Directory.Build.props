@@ -1,8 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +21,7 @@
   </PropertyGroup>
 
   <!-- PACKAGE AND VERSION CREATION -->
+  <Import Project="built\*.Build.props" />
   <ItemGroup>
     <Compile Include="..\..\built\SharedAssemblyInfo*.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
