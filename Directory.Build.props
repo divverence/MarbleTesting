@@ -22,6 +22,7 @@
   </PropertyGroup>
 
   <!-- PACKAGE AND VERSION CREATION -->
+  <Import Project="built\*.Build.props" />
   <ItemGroup>
     <Compile Include="..\..\built\SharedAssemblyInfo*.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
