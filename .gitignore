@@ -197,3 +197,4 @@ ModelManifest.xml
 # ncrunch
 _NCrunch_
 .vs/
+.idea/
