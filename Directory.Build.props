@@ -5,6 +5,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <TreatSpecificWarningsAsErrors />
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
@@ -17,7 +19,7 @@
   <PropertyGroup>
     <Copyright>Copyright 2015-2018 Divverence B.V.</Copyright>
     <Authors>Divverence B.V.</Authors>
-    <PackageIconUrl>http://www.divverence.com/favicon.ico</PackageIconUrl>
+    <PackageIconUrl>http://www.divverence.com/divverencelogo.png</PackageIconUrl>
   </PropertyGroup>
 
   <!-- PACKAGE AND VERSION CREATION -->
