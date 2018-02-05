@@ -13,6 +13,8 @@ This library is complementary to [MarbleTest.Net](https://github.com/alexvictoor
 
 ## Getting Started
 
+You can use `Divverence.MarbleTesting` in .NET and .Net Core 2 - the nuget package is available for `net452` and `netstardard`.
+
 To get the lib just use nuget, from the nuget package console in Visual Studio:
 
 ```posh
