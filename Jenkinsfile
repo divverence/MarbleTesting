@@ -9,6 +9,7 @@ pipeline {
         }
         stage('Submodules') {
             steps {
+                // ToDo: if submodule out-of-date, delete build\packages dir!
                 bat 'git submodule update --init'
             }
         }
