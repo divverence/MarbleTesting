@@ -19,7 +19,7 @@ namespace Divverence.MarbleTesting.Tests
         {
 
             Action parsingNull = () => MarbleParser.ParseSequence(null);
-            parsingNull.ShouldThrow<ArgumentNullException>();
+            parsingNull.Should().Throw<ArgumentNullException>();
         }
 
         [Theory]
@@ -30,7 +30,7 @@ namespace Divverence.MarbleTesting.Tests
         public void Should_throw_ArgumentException_when_passing_wrong_parentheses(string marbleLine)
         {
             Action parsingNull = () => MarbleParser.ParseSequence(marbleLine);
-            parsingNull.ShouldThrow<ArgumentException>();
+            parsingNull.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -41,7 +41,7 @@ namespace Divverence.MarbleTesting.Tests
         public void Should_throw_ArgumentException_when_passing_wrong_braces(string marbleLine)
         {
             Action parsingNull = () => MarbleParser.ParseSequence(marbleLine);
-            parsingNull.ShouldThrow<ArgumentException>();
+            parsingNull.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -56,7 +56,7 @@ namespace Divverence.MarbleTesting.Tests
         public void Should_throw_ArgumentException_when_having_single_element_or_empty_groups(string marbleLine)
         {
             Action parsingNull = () => MarbleParser.ParseSequence(marbleLine);
-            parsingNull.ShouldThrow<ArgumentException>();
+            parsingNull.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -66,7 +66,7 @@ namespace Divverence.MarbleTesting.Tests
         public void Should_throw_ArgumentException_when_nesting_groups_braces(string marbleLine)
         {
             Action parsingNull = () => MarbleParser.ParseSequence(marbleLine);
-            parsingNull.ShouldThrow<ArgumentException>();
+            parsingNull.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -83,7 +83,7 @@ namespace Divverence.MarbleTesting.Tests
         public void Should_throw_ArgumentException_when_passing_two_starters(string marbleLine)
         {
             Action parsingNull = () => MarbleParser.ParseSequence(marbleLine);
-            parsingNull.ShouldThrow<ArgumentException>();
+            parsingNull.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -100,7 +100,7 @@ namespace Divverence.MarbleTesting.Tests
         public void Should_throw_ArgumentException_when_passing_dash_in_group(string marbleLine)
         {
             Action parsingNull = () => MarbleParser.ParseSequence(marbleLine);
-            parsingNull.ShouldThrow<ArgumentException>();
+            parsingNull.Should().Throw<ArgumentException>();
         }
 
         [Fact]
