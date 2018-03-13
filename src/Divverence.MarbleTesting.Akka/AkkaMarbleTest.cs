@@ -16,7 +16,7 @@ namespace Divverence.MarbleTesting.Akka
         /// </summary>
         /// <param name="sys">Your TestKit.Sys ActorSystem</param>
         public AkkaMarbleTest(ActorSystem sys)
-            : this(MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward)
+            : this(MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward, MultiCharMarbleParser.ParseSequence)
         {
         }
 
@@ -25,9 +25,8 @@ namespace Divverence.MarbleTesting.Akka
         /// </summary>
         /// <param name="sys">Your TestKit.Sys ActorSystem</param>
         /// <param name="marbleParserFunc">Your Marble Sequence parser function</param>
-        public AkkaMarbleTest(ActorSystem sys, Func<string, IEnumerable<Moment>> marbleParserFunc) : this(sys)
+        public AkkaMarbleTest(ActorSystem sys, Func<string, IEnumerable<Moment>> marbleParserFunc) : this(MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward, marbleParserFunc)
         {
-            SetMarbleParser(marbleParserFunc);
         }
 
         /// <summary>
@@ -35,7 +34,7 @@ namespace Divverence.MarbleTesting.Akka
         /// </summary>
         /// <param name="waitForIdle">Function that provides a Task that Run(..?) will await after issueing all actions, before verifying expectations</param>
         /// <param name="fastForward">Function that provides a Task that Run(step) will await after veryfying expectations</param>
-        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward) : base(waitForIdle, fastForward)
+        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward) : this(waitForIdle, fastForward, MultiCharMarbleParser.ParseSequence)
         {
         }
 
@@ -47,9 +46,8 @@ namespace Divverence.MarbleTesting.Akka
         /// <param name="fastForward">Function that provides a Task that Run(step) will await after veryfying expectations</param>
         /// <param name="marbleParserFunc">Your Marble Sequence parser function</param>
         public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward,
-            Func<string, IEnumerable<Moment>> marbleParserFunc) : this(waitForIdle, fastForward)
+            Func<string, IEnumerable<Moment>> marbleParserFunc) : base(waitForIdle, fastForward, marbleParserFunc)
         {
-            SetMarbleParser(marbleParserFunc);
         }
 
         /// <summary>

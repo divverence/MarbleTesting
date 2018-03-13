@@ -11,15 +11,14 @@ namespace Divverence.MarbleTesting
         private readonly Func<Task> _waitForIdle;
         protected List<ExpectedMarbles> Expectations = new List<ExpectedMarbles>();
         protected List<InputMarbles> Inputs = new List<InputMarbles>();
-        private static Func<string,IEnumerable<Moment>> _parseSequenceFunc = MarbleParser.ParseSequence;
+        private static Func<string,IEnumerable<Moment>> _parseSequenceFunc;
 
-        public MarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward)
+        public MarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward, Func<string, IEnumerable<Moment>> parserFunc = null)
         {
             _waitForIdle = waitForIdle;
             _fastForward = fastForward;
+            _parseSequenceFunc = parserFunc ?? MarbleParser.ParseSequence;
         }
-
-        public void SetMarbleParser(Func<string, IEnumerable<Moment>> parserFunc) => _parseSequenceFunc = parserFunc;
 
         private Task SystemIdle => _waitForIdle();
 
