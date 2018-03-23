@@ -1,38 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <!-- BUILD -->
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-
   <!-- *SPECIFICS* -->
   <PropertyGroup>
     <Description>Divverence.MarbleTesting Library for Akka.Net</Description>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
   <!-- *REF FRAMEWORK* -->
   <ItemGroup>
   </ItemGroup>
-
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
     <PackageReference Include="Akka.TestKit" Version="1.3.5" />
   </ItemGroup>
-
   <!-- *REF PROJECTS* -->
   <ItemGroup>
     <ProjectReference Include="..\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj" />
   </ItemGroup>
-
   <!-- *EMBEDDED RESOURCES* -->
   <ItemGroup>
   </ItemGroup>
-
   <!-- EMBED SOURCES -->
   <ItemGroup>
     <EmbeddedFiles Include="@(Compile)" />
   </ItemGroup>
-
 </Project>

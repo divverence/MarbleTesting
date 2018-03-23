@@ -28,7 +28,7 @@
     <Compile Include="..\..\built\SharedAssemblyInfo*.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
 
-  <!-- Divverence.Gear.Configuration -->
+  <!-- Divv.Gear.Configuration -->
   <ItemGroup>
     <ConfigurationFiles Include="etc\**\*.properties" />
   </ItemGroup>
