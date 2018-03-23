@@ -1,39 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <!-- BUILD -->
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>netcoreapp2.0;net452</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-
   <!-- *SPECIFICS* -->
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
   <!-- *REF FRAMEWORK* -->
   <ItemGroup>
   </ItemGroup>
-
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
     <PackageReference Include="Akka.TestKit.Xunit2" Version="1.3.2" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
-
   <!-- *REF PROJECTS* -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\Divverence.MarbleTesting.Akka\Divverence.MarbleTesting.Akka.csproj" />
+    <ProjectReference Include="..\..\src\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj" />
   </ItemGroup>
-
   <!-- *EMBEDDED RESOURCES* -->
   <ItemGroup>
   </ItemGroup>
-
   <!-- EMBED SOURCES -->
   <ItemGroup>
     <EmbeddedFiles Include="@(Compile)" />
   </ItemGroup>
-
 </Project>
