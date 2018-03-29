@@ -44,6 +44,34 @@ namespace Divverence.MarbleTesting
             Inputs.Add(new InputMarbles(sequence, actions));
         }
 
+        public void AddExpectations(ExpectedMarbles marbles) => Expectations.Add(marbles);
+
+        public void Expect(string sequence, Func<string, Action> assertionFactory, Action nothingElseAssertion,
+            Func<Moment, ExpectedMarble> unorderedGroupExpectationCreator) =>
+            Expect(sequence, assertionFactory, nothingElseAssertion, m => Enumerable.Repeat(unorderedGroupExpectationCreator(m), 1));
+
+        public void Expect(string sequence, Func<string, Action> assertionFactory, Action nothingElseAssertion, Func<Moment, IEnumerable<ExpectedMarble>> unorderedGroupExpectationsCreator = null)
+        {
+            var expectations = ParseSequence(sequence)
+                .SelectMany(moment => CreateExpectations(moment, assertionFactory, nothingElseAssertion, unorderedGroupExpectationsCreator));
+            AddExpectations(new ExpectedMarbles(sequence, expectations));
+        }
+
+        protected static IEnumerable<ExpectedMarble> CreateExpectations(Moment moment, Func<string, Action> assertionFactory, Action nothingElseAssertion, Func<Moment,IEnumerable<ExpectedMarble>> unorderedGroupExpectationsCreator = null)
+        {
+            if (!moment.IsOrderedGroup)
+            {
+                if (unorderedGroupExpectationsCreator == null)
+                    throw new NotImplementedException();
+                return unorderedGroupExpectationsCreator(moment);
+            }
+            return moment.Marbles
+                .Select(
+                    marble =>
+                        new ExpectedMarble(moment.Time, marble, assertionFactory(marble)))
+                .Concat(Enumerable.Repeat(new ExpectedMarble(moment.Time, null, nothingElseAssertion), 1));
+        }
+
         protected static IEnumerable<Moment> ParseSequence(string sequence)
         {
             return _parseSequenceFunc(sequence);
