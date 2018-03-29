@@ -63,70 +63,48 @@ namespace Divverence.MarbleTesting.Akka
         /// Returns the Akka.Testkit default config, patched with the settings that make sure the Awaitable Dispatcher is used for both test probes and all actors, and TestScheduler from Akka Testkit is the active scheduler.
         /// </summary>
         public static Config AsyncTestingConfig => ConfigExtensionsForAsyncTesting.AsyncTestingConfig;
+    }
 
-        public void WhenTelling(string sequence, IActorRef toWhom, Func<string, object> whatToSend)
-            => WhenTelling(sequence, toWhom, marble => Task.FromResult(whatToSend(marble)));
+    public static class MarbleTestExtensionsForAkka
+    {
+        public static void WhenTelling(this MarbleTest marbleTest, string sequence, IActorRef toWhom,
+            Func<string, object> whatToSend)
+            => marbleTest.WhenTelling(sequence, toWhom, marble => Task.FromResult(whatToSend(marble)));
 
-        public void WhenTelling<T>(string sequence, IActorRef toWhom, Func<string, Task<T>> whatToSend)
-            => WhenDoing(sequence, async marble => toWhom.Tell(await whatToSend(marble)));
+        public static void WhenTelling<T>(this MarbleTest marbleTest, string sequence, IActorRef toWhom,
+            Func<string, Task<T>> whatToSend)
+            => marbleTest.WhenDoing(sequence, async marble => toWhom.Tell(await whatToSend(marble)));
 
-        public void ExpectMsgs<T>(string sequence, TestProbe probe, Func<string, T, bool> predicate)
-        {
-            var expectations = ParseSequence(sequence)
-                .SelectMany(moment => CreateExpectations(moment, probe, predicate));
-            Expectations.Add(new ExpectedMarbles(sequence, expectations));
-        }
-
-        public void ExpectMsgs<T>(string sequence, TestProbe probe, Func<string, Action<T>> predicate)
-        {
-            var expectations = ParseSequence(sequence)
-                .SelectMany(moment => CreateExpectations(moment, probe, predicate));
-            Expectations.Add(new ExpectedMarbles(sequence, expectations));
-        }
-
-        public void ExpectMsgs(string sequence, TestProbe probe, Func<string, object, bool> predicate)
-            => ExpectMsgs<object>(sequence, probe, predicate);
-
-        public void ExpectMsgs(string sequence, TestProbe probe, Func<string, Action<object>> predicate)
-            => ExpectMsgs<object>(sequence, probe, predicate);
-
-        public void ExpectMsgs(string sequence, TestProbe probe)
-            => ExpectMsgs<string>(sequence, probe, (marble, msg) => marble == msg);
-
-        private static IEnumerable<ExpectedMarble> CreateExpectations<T>(Moment moment, TestKitBase probe,
-            Func<string, T, bool> predicate)
-        {
-            if (!moment.IsOrderedGroup)
-            {
-                return new[]
-                {
-                    new ExpectedMarble(moment.Time, FormatMarblesInUnorderedGroup(moment.Marbles),
-                        CreateExpectationForUnorderedGroup(moment.Marbles, probe, (Func<string,Action<T>>)(m => t => predicate(m,t))))
-                };
-            }
-            return moment.Marbles
-                .Select(
-                    marble =>
-                        new ExpectedMarble(moment.Time, marble, () => probe.ExpectMsg<T>(t => predicate(marble, t), TimeSpan.Zero)))
-                .Concat(Enumerable.Repeat(new ExpectedMarble(moment.Time, null, () => probe.ExpectNoMsg(0)), 1));
-        }
-
-        private static IEnumerable<ExpectedMarble> CreateExpectations<T>(Moment moment, TestKitBase probe,
+        public static void ExpectMsgs<T>(this MarbleTest marbleTest, string sequence, TestProbe probe,
             Func<string, Action<T>> assertionFactory)
         {
-            if (!moment.IsOrderedGroup)
-            {
-                return new[]
-                {
-                    new ExpectedMarble(moment.Time, FormatMarblesInUnorderedGroup(moment.Marbles),
-                        CreateExpectationForUnorderedGroup(moment.Marbles, probe, assertionFactory))
-                };
-            }
-            return moment.Marbles
-                .Select(
-                    marble =>
-                        new ExpectedMarble(moment.Time, marble, () => probe.ExpectMsg(assertionFactory(marble), TimeSpan.Zero)))
-                .Concat(Enumerable.Repeat(new ExpectedMarble(moment.Time, null, () => probe.ExpectNoMsg(0)), 1));
+            marbleTest.Expect(sequence, marble => () => probe.ExpectMsg(assertionFactory(marble), TimeSpan.Zero),
+                () => probe.ExpectNoMsg(0),
+                moment => AkkaUnorderedExpectations.CreateExpectedMarbleForUnorderedGroup(moment, probe, assertionFactory));
+        }
+
+        public static void ExpectMsgs<T>(this MarbleTest marbleTest, string sequence, TestProbe probe,
+            Func<string, T, bool> predicate) =>
+            marbleTest.ExpectMsgs(sequence, probe, (Func<string, Action<T>>) (m => t => predicate(m, t)));
+
+        public static void ExpectMsgs(this MarbleTest marbleTest, string sequence, TestProbe probe,
+            Func<string, object, bool> predicate)
+            => marbleTest.ExpectMsgs<object>(sequence, probe, predicate);
+
+        public static void ExpectMsgs(this MarbleTest marbleTest, string sequence, TestProbe probe,
+            Func<string, Action<object>> predicate)
+            => marbleTest.ExpectMsgs<object>(sequence, probe, predicate);
+
+        public static void ExpectMsgs(this MarbleTest marbleTest, string sequence, TestProbe probe)
+            => marbleTest.ExpectMsgs<string>(sequence, probe, (marble, msg) => marble == msg);
+    }
+
+    public static class AkkaUnorderedExpectations
+    { 
+        public static ExpectedMarble CreateExpectedMarbleForUnorderedGroup<T>(Moment moment, TestKitBase probe, Func<string, Action<T>> assertionFactory)
+        {
+            return new ExpectedMarble(moment.Time, FormatMarblesInUnorderedGroup(moment.Marbles),
+                CreateExpectationForUnorderedGroup(moment.Marbles, probe, assertionFactory));
         }
 
         private static Action CreateExpectationForUnorderedGroup<T>(
@@ -208,9 +186,6 @@ namespace Divverence.MarbleTesting.Akka
 
         private static IEnumerable<Exception> NonNullFailures(IEnumerable<ExpectationResult> failedMarbles) => failedMarbles.Where(m => m.Failure != null).Select(r => r.Failure);
 
-        private static string FormatMarblesInUnorderedGroup(IEnumerable<string> marbles) =>
-            $"< {string.Join(" ", marbles)} >";
-
         private static string BuildAssertionsMessage(IEnumerable<ExpectationResult> failedMarbles)
         {
             return string.Join(Environment.NewLine,
@@ -223,6 +198,9 @@ namespace Divverence.MarbleTesting.Akka
                     return $"receiving marble '{m.Marble}' : lead to failure: {m.Failure}";
                 }));
         }
+
+        public static string FormatMarblesInUnorderedGroup(IEnumerable<string> marbles) =>
+            $"< {string.Join(" ", marbles)} >";
 
         private static void EnhanceMessageForTimeoutWhileWaitingForMessage(
             Exception e,
