@@ -1,11 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <TreatSpecificWarningsAsErrors />
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
@@ -18,15 +19,16 @@
   <PropertyGroup>
     <Copyright>Copyright 2015-2018 Divverence B.V.</Copyright>
     <Authors>Divverence B.V.</Authors>
-    <PackageIconUrl>http://www.divverence.com/favicon.ico</PackageIconUrl>
+    <PackageIconUrl>http://www.divverence.com/divverencelogo.png</PackageIconUrl>
   </PropertyGroup>
 
   <!-- PACKAGE AND VERSION CREATION -->
+  <Import Project="built\*.Build.props" />
   <ItemGroup>
     <Compile Include="..\..\built\SharedAssemblyInfo*.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
 
-  <!-- Divverence.Gear.Configuration -->
+  <!-- Divv.Gear.Configuration -->
   <ItemGroup>
     <ConfigurationFiles Include="etc\**\*.properties" />
   </ItemGroup>

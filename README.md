@@ -1,6 +1,6 @@
 # Divverence.MarbleTesting.Akka
 
-Divverence.MarbleTesting.Akka is a small library that allows to write tests for [Akka.Net](https://github.com/akkadotnet/akka.net/) actors / systems using marble diagrams in text form.  
+Divverence.MarbleTesting.Akka is a small library that allows to write tests for [Akka.Net](https://github.com/akkadotnet/akka.net/) actors / systems using marble diagrams in text form.
 This library is inspired by the practice in the Rx / ReactiveStreams world to use [marble diagrams](http://rxmarbles.com/) to describe the (intented) behaviour of operators.
 It's our belief that this concept also applies very nicely to [Actors](https://petabridge.com/blog/akkadotnet-what-is-an-actor/) in an [actor model](https://en.wikipedia.org/wiki/Actor_model).
 Inspiration for this library came from the ideas of [Erik Meijer](https://twitter.com/headinthebox) and the [marble test features](https://github.com/ReactiveX/rxjs/blob/master/doc/writing-marble-tests.md) of RxJS v5.
@@ -13,25 +13,52 @@ This library is complementary to [MarbleTest.Net](https://github.com/alexvictoor
 
 ## Getting Started
 
-To get the lib just use nuget as below:
+You can use `Divverence.MarbleTesting` in .NET and .Net Core 2 - the nuget package is available for `net452` and `netstardard`.
 
-```
+To get the lib just use nuget, from the nuget package console in Visual Studio:
+
+```posh
+PM> Install-Package Divverence.MarbleTesting
 PM> Install-Package Divverence.MarbleTesting.Akka
+```
+
+Or add it with the dotnet CLI from `cmd`, `powershell` or `bash`:
+
+```sh
+dotnet add package Divverence.MarbleTesting.Akka
 ```
 
 ## Usage
 
-ToDo
+Use pieces of code like this in your unit tests for you actors:
+
+```csharp
+var marbleTest = new AkkaMarbleTest( ActorSystem );
+marbleTest.WhenTelling("       --a---a---b--a-c--", disctinctActor, s => s);
+marbleTest.ExpectMsgs<string>("--a-------b----c--", s => o => o.Should().Be(s));
+await marbleTest.Run();
+```
+
+```csharp
+var marbleTest = new AkkaMarbleTest( Sys );
+var throttleActor = Sys.ActorOf( ThrottleActor.Props(TimeSpan.FromSeconds(5)) );
+marbleTest.WhenTelling("       --a---a-b-----c---------(d,e)---", throttleActor, s => s);
+marbleTest.ExpectMsgs<string>("--a----a----b----c------d----e--", s => o => o.Should().Be(s));
+var virtualTimeStep = TimeSpan.FromSeconds(1);
+await marbleTest.Run(virtualTimeStep); // This runs in milliseconds!
+```
 
 ## Building
 
 Use dotnet CLI 2.0:
 
-`dotnet build -c Release`
+```sh
+dotnet build -c Release
+```
 
 ## Marble Sequence syntax
 
-The syntax for describing Sequences is compatible with the RxJS syntax.   
+The syntax for describing Sequences is compatible with the RxJS syntax.
 Each character represents what happens during a moment in virtual time.
 
 **'-'** means that no message is sent/received at that moment
@@ -56,8 +83,8 @@ And in the 'Expect' usage, "X-Y-" means:
 
 ### Simultaneous messages
 
-If messages should be sent or expected simultaneously, you can group them using paranthesis.  
-So "--(abc)--" means events a, b and c occur at moment 2.  
+If messages should be sent or expected simultaneously, you can group them using paranthesis.
+So "--(abc)--" means events a, b and c occur at moment 2.
 
 For a complete description of the syntax, please refer to the [official RxJS documentation](https://github.com/ReactiveX/rxjs/blob/master/doc/writing-marble-tests.md)
 

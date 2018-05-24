@@ -1,38 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <!-- BUILD -->
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-
   <!-- *SPECIFICS* -->
   <PropertyGroup>
     <Description>Divverence.MarbleTesting Core Library</Description>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
   <!-- *REF FRAMEWORK* -->
   <ItemGroup>
   </ItemGroup>
-
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
   </ItemGroup>
-
   <!-- *REF PROJECTS* -->
   <ItemGroup>
   </ItemGroup>
-
   <!-- *EMBEDDED RESOURCES* -->
   <ItemGroup>
   </ItemGroup>
-
   <!-- EMBED SOURCES -->
   <ItemGroup>
     <EmbeddedFiles Include="@(Compile)" />
   </ItemGroup>
-
 </Project>
