@@ -6,6 +6,7 @@ pipeline {
             steps {
                 // ToDo: if submodule out-of-date, delete build\packages dir!
                 bat 'git submodule update --init'
+                // Force Develop, master to exist for gitversion to be happy - each command will fail (by design) if current branch IS that branch, hence the exit 0
             }
         }
         stage('Build') {
@@ -19,7 +20,16 @@ pipeline {
             step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: true, pattern: '**/testresults.xml', skipNoTestFiles: true, stopProcessingIfError: true]]])
         }
         success {
-            slackSend (color: '#008000', message: "Built OK: ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+            script {
+                def tag = bat (returnStdout: true, script: '@git tag -l --points-at HEAD')
+                echo "Tag: ${tag}"
+
+                if (tag?.trim()) {
+                    slackSend (color: '#008000', message: "Built OK: ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}> `${tag.trim()}`")
+                } else {
+                    slackSend (color: '#008000', message: "Built OK: ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>")
+                }
+            }
         }
         // unstable {}
         failure {
