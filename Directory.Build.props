@@ -33,7 +33,7 @@
     <ConfigurationFiles Include="etc\**\*.properties" />
   </ItemGroup>
   <Target Name="MyAfterBuild" AfterTargets="Build">
-    <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles-&gt;'$(OutDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
+    <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles-&gt;'$(ProjectDir)$(Configuration)\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
   </Target>
 
 </Project>

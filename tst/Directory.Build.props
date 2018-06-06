@@ -4,7 +4,7 @@
   <!-- Note that the actual .csproj will have to contain these (and the same values!) as well -->
   <!-- Also note that the top level directory Directory.Build.props is *not* also included -->
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net452</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net452</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.3</RuntimeFrameworkVersion>
   </PropertyGroup>
@@ -17,13 +17,5 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
-
-  <!-- Divv.Gear.Configuration -->
-  <ItemGroup>
-    <ConfigurationFiles Include="etc\**\*.properties" />
-  </ItemGroup>
-  <Target Name="MyAfterBuild" AfterTargets="Build">
-    <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles-&gt;'$(OutDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
-  </Target>
 
 </Project>
