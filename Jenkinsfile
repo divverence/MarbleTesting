@@ -17,7 +17,7 @@ pipeline {
     }
     post {
         always {
-            step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: true, pattern: '**/testresults.xml', skipNoTestFiles: true, stopProcessingIfError: true]]])
+           step([$class: 'MSTestPublisher', testResultsFile: '**/testresults*.xml', failOnError: true, keepLongStdio: true])
         }
         success {
             script {
@@ -34,7 +34,7 @@ pipeline {
         // unstable {}
         failure {
             slackSend (color: '#800000', message: """Build Failed: ${env.JOB_NAME} <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
-Commit SHA: ${env.GIT_COMMIT}""")
+            Commit SHA: ${env.GIT_COMMIT}""")
         }
         // changed {}
     }

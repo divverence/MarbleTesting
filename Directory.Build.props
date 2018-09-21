@@ -1,7 +1,6 @@
 <Project>
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -31,9 +30,11 @@
   <!-- Divv.Gear.Configuration -->
   <ItemGroup>
     <ConfigurationFiles Include="etc\**\*.properties" />
+    <ConfigurationFiles Include="etc\**\*.ini" />
+    <ConfigurationFiles Include="etc\**\*.json" />
   </ItemGroup>
   <Target Name="MyAfterBuild" AfterTargets="Build">
-    <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles-&gt;'$(ProjectDir)$(Configuration)\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
+    <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles-&gt;'$(ProjectDir)bin\$(Configuration)\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
   </Target>
 
 </Project>
