@@ -113,6 +113,18 @@ namespace Divverence.MarbleTesting.Akka.Tests
         }
 
         [Fact]
+        public async Task TestThatMultipleExpectationLinesForTheSameProbeAreOkEvenIfTheyAreOutOfOrder()
+        {
+            var marbleTest = new AkkaMarbleTest(Sys);
+            var testProbe = CreateTestProbe(Sys, "OutputProbe");
+            marbleTest.WhenTelling("         a-b-c-d-e-f", testProbe, _ => _);
+            marbleTest.ExpectMsgs<string>("  ----c-----f", testProbe, (marble, data) => marble == data);
+            marbleTest.ExpectMsgs<string>("  a-----d----", testProbe, (marble, data) => marble == data);
+            marbleTest.ExpectMsgs<string>("  --b-----e--", testProbe, (marble, data) => marble == data);
+            await marbleTest.Run();
+        }
+
+        [Fact]
         public async Task TestThatMultipleExpectationLinesForTheSameProbeStillFailIfOneExpectationMisses()
         {
             var marbleTest = new AkkaMarbleTest(Sys);
