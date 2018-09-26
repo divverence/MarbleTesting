@@ -13,11 +13,13 @@ Change log entries should be formulated in the imperative present tense.
 
 ## Unreleased
 
+## [0.6.0] - 2018-09-26
+
 ### Added
 
 * Add support for multiple expectations that share the same 'probe'
 
-## 0.5.0
+## [0.5.0]
 
 ### Added
 
