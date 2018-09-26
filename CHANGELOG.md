@@ -11,6 +11,12 @@ Change log entries should be formulated in the imperative present tense.
 
 # Changelog
 
+## Unreleased
+
+### Added
+
+* Add support for multiple expectations that share the same 'probe'
+
 ## 0.5.0
 
 ### Added
