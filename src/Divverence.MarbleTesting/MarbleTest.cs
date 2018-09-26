@@ -32,6 +32,7 @@ namespace Divverence.MarbleTesting
                 await Task.WhenAll(Inputs.Select(atl => atl.Run(localTime)));
                 await SystemIdle;
                 Expectations.ForEach(etl => etl.Verify(time));
+                Expectations.ForEach(etl => etl.VerifyNothingElse(time));
                 if (interval.HasValue)
                     await FastForward(interval.Value);
             }
