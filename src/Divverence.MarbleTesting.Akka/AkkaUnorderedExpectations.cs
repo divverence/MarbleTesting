@@ -1,22 +1,30 @@
-﻿using System;
+﻿using Akka.TestKit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Akka.TestKit;
 
 namespace Divverence.MarbleTesting.Akka
 {
     public static class AkkaUnorderedExpectations
-    { 
-        public static ExpectedMarble CreateExpectedMarbleForUnorderedGroup<T>(Moment moment, TestKitBase probe, Func<string, Action<T>> assertionFactory)
+    {
+        public static ExpectedMarble CreateExpectedMarbleForUnorderedGroup<T>(
+            Moment moment,
+            TestKitBase probe,
+            Func<string, Action<T>> assertionFactory)
         {
-            return new ExpectedMarble(moment.Time, FormatMarblesInUnorderedGroup(moment.Marbles),
-                CreateExpectationForUnorderedGroup(moment.Marbles, probe, assertionFactory));
+            return new ExpectedMarble(
+                moment.Time,
+                FormatMarblesInUnorderedGroup(moment.Marbles),
+                CreateExpectationForUnorderedGroup(
+                    moment.Marbles,
+                    probe,
+                    assertionFactory));
         }
 
         private static Action CreateExpectationForUnorderedGroup<T>(
             string[] marblesInGroup,
             TestKitBase probe,
-            Func<string, Action<T>> expectionGenerator)
+            Func<string, Action<T>> expectationGenerator)
         {
             return () =>
             {
@@ -26,7 +34,7 @@ namespace Divverence.MarbleTesting.Akka
                 {
                     var expectationResults = new List<ExpectationResult>();
                     results.Add(expectationResults);
-                    TryExpectMsg(marblesInGroup, probe, expectionGenerator, marblesReceived, expectationResults, results);
+                    TryExpectMsg(marblesInGroup, probe, expectationGenerator, marblesReceived, expectationResults, results);
                 }
                 try
                 {
@@ -37,7 +45,7 @@ namespace Divverence.MarbleTesting.Akka
                             TryExpectationsForEachMarble(
                                 marblesInGroup,
                                 marblesReceived,
-                                expectionGenerator,
+                                expectationGenerator,
                                 expectationResults,
                                 n);
                             var marblesNotYetReceived = marblesInGroup.Except(marblesReceived).ToList();
@@ -61,8 +69,13 @@ namespace Divverence.MarbleTesting.Akka
             };
         }
 
-        private static void TryExpectMsg<T>(string[] marblesInGroup, TestKitBase probe, Func<string, Action<T>> expectionGenerator,
-            List<string> marblesReceived, List<ExpectationResult> expectationResults, List<List<ExpectationResult>> results)
+        private static void TryExpectMsg<T>(
+            string[] marblesInGroup,
+            TestKitBase probe,
+            Func<string, Action<T>> expectationGenerator,
+            List<string> marblesReceived,
+            List<ExpectationResult> expectationResults,
+            List<List<ExpectationResult>> results)
         {
             try
             {
@@ -71,7 +84,7 @@ namespace Divverence.MarbleTesting.Akka
                         TryExpectationsForEachMarble(
                             marblesInGroup,
                             marblesReceived,
-                            expectionGenerator,
+                            expectationGenerator,
                             expectationResults,
                             n);
                     },
@@ -114,13 +127,13 @@ namespace Divverence.MarbleTesting.Akka
             IEnumerable<string> marblesReceived,
             IEnumerable<ExpectationResult> resultsSoFar)
         {
-            throw new Exception($"Did not recieve all marbles in group '{FormatMarblesInUnorderedGroup(marblesInGroup)}' only received '{FormatMarblesInUnorderedGroup(marblesReceived)}'{Environment.NewLine}{string.Join(Environment.NewLine, NonNullFailures(resultsSoFar))}", e);
+            throw new Exception($"Did not receive all marbles in group '{FormatMarblesInUnorderedGroup(marblesInGroup)}' only received '{FormatMarblesInUnorderedGroup(marblesReceived)}'{Environment.NewLine}{string.Join(Environment.NewLine, NonNullFailures(resultsSoFar))}", e);
         }
 
         private static void TryExpectationsForEachMarble<T>(
             IEnumerable<string> marblesInGroup,
             ICollection<string> marblesReceived,
-            Func<string, Action<T>> expectionGenerator,
+            Func<string, Action<T>> expectationGenerator,
             ICollection<ExpectationResult> results,
             T received)
         {
@@ -130,7 +143,7 @@ namespace Divverence.MarbleTesting.Akka
                 results.Add(expResult);
                 try
                 {
-                    expectionGenerator(marble)(received);
+                    expectationGenerator(marble)(received);
                     marblesReceived.Add(marble);
                 }
                 catch (Exception e)
