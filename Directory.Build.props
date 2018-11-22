@@ -32,6 +32,7 @@
     <ConfigurationFiles Include="etc\**\*.properties" />
     <ConfigurationFiles Include="etc\**\*.ini" />
     <ConfigurationFiles Include="etc\**\*.json" />
+    <ConfigurationFiles Include="etc\**\*.config" />
   </ItemGroup>
   <Target Name="MyAfterBuild" AfterTargets="Build">
     <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles-&gt;'$(ProjectDir)bin\$(Configuration)\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />

@@ -198,3 +198,6 @@ ModelManifest.xml
 _NCrunch_
 .vs/
 .idea/
+
+# JUnit
+generatedJUnitFiles/

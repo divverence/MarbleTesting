@@ -13,14 +13,62 @@ Change log entries should be formulated in the imperative present tense.
 
 ## Unreleased
 
+## [0.7.0] - 2018-11-22
+
+### Added
+
+* Add optional parameter for the `nothingElseAssertion` in `MarbleTestExtensionsForAkka` `ExpectMsg` and `ExpectMsg<T>`.
+
+### Deprecated
+
+* Mark overloads of `ExpectMsg` that have a `Predicate` as the 'assertion' parameter as `[Obsolete]`.
+
 ## [0.6.0] - 2018-09-26
 
 ### Added
 
 * Add support for multiple expectations that share the same 'probe'
 
-## [0.5.0]
+## [0.5.0] - 2018-05-24
 
 ### Added
 
 * Add netstandard 2.0 support, in addition to .NET 4.5.2
+
+## [0.4.0] - 2018-01-10
+
+### Addded
+
+* Add support for unordered groups.
+
+## [0.3.0] - 2017-10-27
+
+### Fixed
+
+* Fix handling of leading spaces in the sequence when formatting error messages.
+
+### Added
+
+* Add helper methods for using custom assertions asynchronously.
+
+## [0.2.2] - 2017-09-07
+
+### Added
+
+* Add support for providing assertions in `ExpectMsg`.
+
+## [0.2.1] - 2017-08-03
+
+### Changed
+
+* Update used version of `xunit`.
+
+## [0.2.0] - 2017-08-03
+
+### Added
+
+* Support for multi character marbles. 
+
+## [0.1.0] - 2016-11-28
+
+* First release.
