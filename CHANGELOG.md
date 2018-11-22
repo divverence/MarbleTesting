@@ -17,7 +17,7 @@ Change log entries should be formulated in the imperative present tense.
 
 * Add optional parameter for the `nothingElseAssertion` in `MarbleTestExtensionsForAkka` `ExpectMsg` and `ExpectMsg<T>`.
 
-### Changed
+### Deprecated
 
 * Mark overloads of `ExpectMsg` that have a `Predicate` as the 'assertion' parameter as `[Obsolete]`.
 

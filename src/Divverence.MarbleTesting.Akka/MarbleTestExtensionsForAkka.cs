@@ -41,17 +41,17 @@ namespace Divverence.MarbleTesting.Akka
             Action nothingElseAssertion = null)
             => marbleTest.ExpectMsgs<object>(sequence, probe, assertion, nothingElseAssertion);
 
-        [Obsolete]
+        [Obsolete("Use the overload with the Func<string, Action<T>> parameter where the action contains a custom assertion, such that more meaningful failure messages can be generated.")]
         public static void ExpectMsgs<T>(this MarbleTest marbleTest, string sequence, TestProbe probe,
             Func<string, T, bool> predicate) =>
             marbleTest.ExpectMsgs(sequence, probe, (Func<string, Action<T>>)(m => t => predicate(m, t)));
 
-        [Obsolete]
+        [Obsolete("Use the overload with the Func<string, Action<object>> parameter where the action contains a custom assertion, such that more meaningful failure messages can be generated.")]
         public static void ExpectMsgs(this MarbleTest marbleTest, string sequence, TestProbe probe,
             Func<string, object, bool> predicate)
             => marbleTest.ExpectMsgs<object>(sequence, probe, predicate);
 
-        [Obsolete]
+        [Obsolete("Use the overload with the Func<string, Action<T>> parameter where the action contains a custom assertion, such that more meaningful failure messages can be generated.")]
         public static void ExpectMsgs(this MarbleTest marbleTest, string sequence, TestProbe probe)
             => marbleTest.ExpectMsgs<string>(sequence, probe, (marble, msg) => marble == msg);
     }
