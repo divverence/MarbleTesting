@@ -13,6 +13,8 @@ Change log entries should be formulated in the imperative present tense.
 
 ## Unreleased
 
+## [0.7.0] - 2018-11-22
+
 ### Added
 
 * Add optional parameter for the `nothingElseAssertion` in `MarbleTestExtensionsForAkka` `ExpectMsg` and `ExpectMsg<T>`.
