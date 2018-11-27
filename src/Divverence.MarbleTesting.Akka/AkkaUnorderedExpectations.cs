@@ -1,5 +1,4 @@
-﻿using Akka.TestKit;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +8,7 @@ namespace Divverence.MarbleTesting.Akka
     {
         public static ExpectedMarble CreateExpectedMarbleForUnorderedGroup<T>(
             Moment moment,
-            TestKitBase probe,
+            Action<Action<T>> expectation,
             Func<string, Action<T>> assertionFactory)
         {
             return new ExpectedMarble(
@@ -17,13 +16,13 @@ namespace Divverence.MarbleTesting.Akka
                 FormatMarblesInUnorderedGroup(moment.Marbles),
                 CreateExpectationForUnorderedGroup(
                     moment.Marbles,
-                    probe,
+                    expectation,
                     assertionFactory));
         }
 
         private static Action CreateExpectationForUnorderedGroup<T>(
             string[] marblesInGroup,
-            TestKitBase probe,
+            Action<Action<T>> expectation,
             Func<string, Action<T>> expectationGenerator)
         {
             return () =>
@@ -34,11 +33,11 @@ namespace Divverence.MarbleTesting.Akka
                 {
                     var expectationResults = new List<ExpectationResult>();
                     results.Add(expectationResults);
-                    TryExpectMsg(marblesInGroup, probe, expectationGenerator, marblesReceived, expectationResults, results);
+                    TryExpectMsg(marblesInGroup, expectation, expectationGenerator, marblesReceived, expectationResults, results);
                 }
                 try
                 {
-                    probe.ExpectMsg<T>(n =>
+                    expectation(n =>
                         {
                             var expectationResults = new List<ExpectationResult>();
                             results.Add(expectationResults);
@@ -59,8 +58,7 @@ namespace Divverence.MarbleTesting.Akka
                                     $"'{FormatMarblesInUnorderedGroup(marblesReceived)}' " +
                                     $"{BuildAssertionsMessage(failedMarbles)}.", NonNullFailures(failedMarbles));
                             }
-                        },
-                        TimeSpan.Zero);
+                        });
                 }
                 catch (Exception e) when (e.Message.Contains("Timeout"))
                 {
@@ -71,7 +69,7 @@ namespace Divverence.MarbleTesting.Akka
 
         private static void TryExpectMsg<T>(
             string[] marblesInGroup,
-            TestKitBase probe,
+            Action<Action<T>> expectation,
             Func<string, Action<T>> expectationGenerator,
             List<string> marblesReceived,
             List<ExpectationResult> expectationResults,
@@ -79,7 +77,7 @@ namespace Divverence.MarbleTesting.Akka
         {
             try
             {
-                probe.ExpectMsg<T>(n =>
+                expectation(n =>
                     {
                         TryExpectationsForEachMarble(
                             marblesInGroup,
@@ -87,8 +85,7 @@ namespace Divverence.MarbleTesting.Akka
                             expectationGenerator,
                             expectationResults,
                             n);
-                    },
-                    TimeSpan.Zero);
+                    });
             }
             catch (Exception e) when (e.Message.Contains("Timeout"))
             {

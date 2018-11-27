@@ -30,7 +30,7 @@ namespace Divverence.MarbleTesting.Akka
         {
             marbleTest.Expect(sequence, marble => () => probe.ExpectMsg(assertionFactory(marble), TimeSpan.Zero),
                 nothingElseAssertion ?? (() => probe.ExpectNoMsg(0)),
-                moment => AkkaUnorderedExpectations.CreateExpectedMarbleForUnorderedGroup(moment, probe, assertionFactory));
+                moment => AkkaUnorderedExpectations.CreateExpectedMarbleForUnorderedGroup(moment, act => probe.ExpectMsg(act, TimeSpan.Zero), assertionFactory));
         }
 
         public static void ExpectMsgs(
