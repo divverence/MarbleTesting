@@ -2,12 +2,121 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Divverence.MarbleTesting
 {
     public class MarbleTest
     {
+        private class MarbleEventAssertionResultTable
+        {
+            public class Result
+            {
+                public Result(
+                    string marble,
+                    object @event,
+                    string assertionExceptionMessage)
+                {
+                    Marble = marble;
+                    Event = @event;
+                    Succeeded = string.IsNullOrWhiteSpace(assertionExceptionMessage);
+                    AssertionExceptionMessage = assertionExceptionMessage;
+                }
+
+                public string Marble { get; }
+                public object Event { get; }
+                public bool Succeeded { get; }
+                public string AssertionExceptionMessage { get; }
+            }
+
+            public List<List<Result>> Results { get; } = new List<List<Result>>();
+
+            public override string ToString()
+            {
+                var result = new StringBuilder();
+                result.AppendLine("Summary:");
+                result.AppendLine("     " + string.Join("    ", Results.Select((row, index) => $"e_{index}")));
+                for (var rowIndex = 0; rowIndex < Results.Count; rowIndex++)
+                {
+                    result.Append("m_");
+                    result.Append(rowIndex);
+                    result.Append("  ");
+                    var row = Results[rowIndex];
+                    for (var i = 0; i < row.Count; i++)
+                    {
+                        var cell = row[i].Succeeded ? "✔     " : $"x_{rowIndex}_{i}  ";
+                        result.Append(cell);
+                        if (i == (row.Count - 1))
+                        {
+                            result.AppendLine();
+                        }
+                    }
+                }
+                result.AppendLine();
+                result.AppendLine("Marbles:");
+                for (var rowIndex = 0; rowIndex < Results.Count; rowIndex++)
+                {
+                    var row = Results[rowIndex];
+                    result.Append("m_");
+                    result.Append(rowIndex);
+                    result.Append(" : ");
+                    result.AppendLine(row[0].Marble);
+                }
+                result.AppendLine();
+                result.AppendLine("Events:");
+                var firstRow = Results[0];
+                for (var i = 0; i < firstRow.Count; i++)
+                {
+                    result.Append("e_");
+                    result.Append(i);
+                    result.Append(" : ");
+                    result.AppendLine(firstRow[i].Event.ToString());
+                }
+
+                result.AppendLine();
+                result.AppendLine("Failure messages:");
+                for (var rowIndex = 0; rowIndex < Results.Count; rowIndex++)
+                {
+                    var row = Results[rowIndex];
+                    for (var i = 0; i < row.Count; i++)
+                    {
+                        if (!row[i].Succeeded)
+                        {
+                            result.AppendLine($"x_{rowIndex}_{i} : {row[i].AssertionExceptionMessage}");
+                        }
+                    }
+
+                }
+                return result.ToString();
+            }
+
+            public bool AllRowsAtLeastOneSuccess()
+            {
+                return Results.All(row => row.Count(c => c.Succeeded) >= 1);
+            }
+
+            public bool AllCollumnsAtLeastOneSuccess()
+            {
+                var collums = new List<List<bool>>();
+                for (var rowIndex = 0; rowIndex < Results.Count; rowIndex++)
+                {
+                    var row = Results[rowIndex];
+                    for (var i = 0; i < row.Count; i++)
+                    {
+                        if (collums.Count < i)
+                        {
+                            collums.Add(new List<bool>(Results.Count));
+                        }
+
+                        collums[i][rowIndex] = row[i].Succeeded;
+                    }
+                }
+
+                return collums.All(c => c.Count(r => r) >= 1);
+            }
+        }
+
         private readonly Func<TimeSpan, Task> _fastForward;
         private readonly Func<Task> _waitForIdle;
         protected List<ExpectedMarbles> Expectations = new List<ExpectedMarbles>();
@@ -86,6 +195,8 @@ namespace Divverence.MarbleTesting
                             throw new Exception(
                                 $"Expecting an ordered group at moment '{moment}' with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
                         }
+
+
                         var exceptions = received.Zip(moment.Marbles, (@event, m) => CheckEvent(assertion, m, @event))
                             .Where(t => !t.Succeeded)
                             .Select(t => (t.Event, t.Expection, t.Marble)).ToList();
@@ -111,6 +222,23 @@ namespace Divverence.MarbleTesting
                                 $"Expecting an unordered group at moment '{moment}' with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
                         }
 
+                        var table = new MarbleEventAssertionResultTable();
+                        foreach (var m in moment.Marbles)
+                        {
+                            var row = new List<MarbleEventAssertionResultTable.Result>();
+                            foreach (var @event in received)
+                            {
+                                var (succeeded, exception, _, _) = CheckEvent(assertion, m, @event);
+                                row.Add(new MarbleEventAssertionResultTable.Result(m, @event, succeeded ? string.Empty : exception.Message));
+                            }
+                            table.Results.Add(row);
+                        }
+
+                        var success = table.AllRowsAtLeastOneSuccess() && table.AllCollumnsAtLeastOneSuccess();
+                        if (!success)
+                        {
+                            throw new Exception(table.ToString());
+                        }
                         var events = new Queue<TEvent>(received);
                         var toCheck = new List<string>(moment.Marbles);
                         var succeededEvents = new List<TEvent>();
@@ -125,7 +253,7 @@ namespace Divverence.MarbleTesting
                             }
                             else
                             {
-                                exceptions.Add((top, exceptionForEvent,m));
+                                exceptions.Add((top, exceptionForEvent, m));
                             }
                         }
 
@@ -186,7 +314,7 @@ namespace Divverence.MarbleTesting
             };
         }
 
-        private static (bool Succeeded, Exception Expection, TEvent Event, string Marble) CheckEvent<TEvent>(
+        private static (bool Succeeded, Exception Expection, string Marble, TEvent Event) CheckEvent<TEvent>(
             Action<string, TEvent> assertion,
             string marble,
             TEvent top)
@@ -194,11 +322,11 @@ namespace Divverence.MarbleTesting
             try
             {
                 assertion(marble, top);
-                return (true, null, top, marble);
+                return (true, null, marble, top);
             }
             catch (Exception e)
             {
-                return (false, e,  top, marble);
+                return (false, e, marble, top);
             }
         }
         private static (bool Succeeded, IList<Exception>, string Marble) CheckEvent<TEvent>(
