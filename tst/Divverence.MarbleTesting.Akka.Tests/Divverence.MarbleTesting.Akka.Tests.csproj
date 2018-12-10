@@ -15,7 +15,6 @@
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
     <PackageReference Include="Akka.TestKit.Xunit2" Version="1.3.2" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <!-- *REF PROJECTS* -->
   <ItemGroup>

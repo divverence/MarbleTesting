@@ -21,7 +21,7 @@ namespace Divverence.MarbleTesting
             var moments = ParseSequence(sequence, out timeOffset);
             if (!timeOffset.HasValue || timeOffset.Value == 0)
                 return moments;
-            return moments.Select(m => new Moment(m.Time + timeOffset.Value, m.Marbles, m.IsOrderedGroup));
+            return moments.Select(m => m.TimeShiftedClone(timeOffset.Value));
         }
 
         private static IEnumerable<Moment> ParseSequence(string sequence, out int? timeOffset)
@@ -42,13 +42,13 @@ namespace Divverence.MarbleTesting
                         {
                             case ' ':
                             case '-':
-                                retVal.Add(new Moment(time));
+                                retVal.Add(Moment.Empty(time));
                                 break;
                             case '^':
                                 if (timeOffset.HasValue)
                                     throw new ArgumentException("Only one ^ character allowed", nameof(sequence));
                                 timeOffset = -time;
-                                retVal.Add(new Moment(time, character.ToString()));
+                                retVal.Add(Moment.Single(time, character.ToString()));
                                 break;
                             case '(':
                                 groupTime = time;
@@ -67,7 +67,7 @@ namespace Divverence.MarbleTesting
                                 throw new ArgumentException("Closing brace without opening brace",
                                     nameof(sequence));
                             default:
-                                retVal.Add(new Moment(time, character.ToString()));
+                                retVal.Add(Moment.Single(time, character.ToString()));
                                 break;
                         }
                         break;
@@ -89,7 +89,7 @@ namespace Divverence.MarbleTesting
                                 {
                                     throw new ArgumentException("Only groups with multiple marbles are allowed", nameof(sequence));
                                 }
-                                retVal.Add(new Moment(groupTime, unOrderedGroupMarbles.ToArray(), false));
+                                retVal.Add(Moment.UnorderedGroup(groupTime, unOrderedGroupMarbles.ToArray()));
                                 unOrderedGroupMarbles = null;
                                 parsingState = ParsingState.NotInGroup;
                                 break;
@@ -124,7 +124,7 @@ namespace Divverence.MarbleTesting
                                 {
                                     throw new ArgumentException("Only groups with multiple marbles are allowed", nameof(sequence));
                                 }
-                                retVal.Add(new Moment(groupTime, groupMarbles.ToArray()));
+                                retVal.Add(Moment.OrderedGroup(groupTime, groupMarbles.ToArray()));
                                 groupMarbles = null;
                                 parsingState = ParsingState.NotInGroup;
                                 break;

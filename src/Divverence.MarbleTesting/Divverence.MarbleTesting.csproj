@@ -11,10 +11,9 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <!-- *REF FRAMEWORK* -->
-  <ItemGroup>
-  </ItemGroup>
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.5.4" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
   </ItemGroup>
   <!-- *REF PROJECTS* -->
@@ -26,5 +25,8 @@
   <!-- EMBED SOURCES -->
   <ItemGroup>
     <EmbeddedFiles Include="@(Compile)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 </Project>

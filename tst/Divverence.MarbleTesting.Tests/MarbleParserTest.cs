@@ -135,14 +135,14 @@ namespace Divverence.MarbleTesting.Tests
         }
 
         [Theory]
-        [InlineData("a-(c^d)-f", true)]
-        [InlineData("a-<c^d>-f", false)]
-        public void Should_take_moment_of_group_start_as_0_time(string inputSequence, bool isOrderedGroup)
+        [InlineData("a-(c^d)-f", Moment.MomentType.OrderedGroup)]
+        [InlineData("a-<c^d>-f", Moment.MomentType.UnorderedGroup)]
+        public void Should_take_moment_of_group_start_as_0_time(string inputSequence, Moment.MomentType expectedMomentType)
         {
             var actual = MarbleParser.ParseSequence(inputSequence);
             actual.First().Time.Should().Be(-2);
             var moment = actual.Skip(2).First();
-            moment.IsOrderedGroup.Should().Be(isOrderedGroup);
+            moment.Type.Should().Be(expectedMomentType);
             moment.Time.Should().Be(0);
         }
 
@@ -160,7 +160,7 @@ namespace Divverence.MarbleTesting.Tests
             var actual = MarbleParser.ParseSequence("ab<cd>ef").ToList();
             actual.Select(m => string.Concat(m.Marbles)).Should().Equal("a", "b", "cd", "e", "f");
             actual.Select(m => m.Time).Should().Equal(0, 1, 2, 6, 7);
-            actual[2].IsOrderedGroup.Should().BeFalse();
+            actual[2].Type.Should().Be(Moment.MomentType.UnorderedGroup);
         }
 
         [Fact]
@@ -177,8 +177,8 @@ namespace Divverence.MarbleTesting.Tests
             var actual = MarbleParser.ParseSequence("ab<cd>ef<gh>").ToList();
             actual.Select(m => string.Concat(m.Marbles)).Should().Equal("a", "b", "cd", "e", "f", "gh");
             actual.Select(m => m.Time).Should().Equal(0, 1, 2, 6, 7, 8);
-            actual[2].IsOrderedGroup.Should().BeFalse();
-            actual[5].IsOrderedGroup.Should().BeFalse();
+            actual[2].Type.Should().Be(Moment.MomentType.UnorderedGroup);
+            actual[5].Type.Should().Be(Moment.MomentType.UnorderedGroup);
         }
 
         [Theory]
@@ -189,8 +189,8 @@ namespace Divverence.MarbleTesting.Tests
             var actual = MarbleParser.ParseSequence(inputSequence).ToList();
             actual.Select(m => string.Concat(m.Marbles)).Should().Equal("a", "b", "cd", "e", "f", "gh");
             actual.Select(m => m.Time).Should().Equal(0, 1, 2, 6, 7, 8);
-            actual[orderedGroupIndex].IsOrderedGroup.Should().BeTrue();
-            actual[unorderedGroupIndex].IsOrderedGroup.Should().BeFalse();
+            actual[orderedGroupIndex].Type.Should().Be(Moment.MomentType.OrderedGroup);
+            actual[unorderedGroupIndex].Type.Should().Be(Moment.MomentType.UnorderedGroup);
         }
 
         [Fact]
@@ -207,7 +207,7 @@ namespace Divverence.MarbleTesting.Tests
             var actual = MarbleParser.ParseSequence("<cd>ef").ToList();
             actual.Select(m => string.Concat(m.Marbles)).Should().Equal("cd", "e", "f");
             actual.Select(m => m.Time).Should().Equal(0, 4, 5);
-            actual[0].IsOrderedGroup.Should().BeFalse();
+            actual[0].Type.Should().Be(Moment.MomentType.UnorderedGroup);
         }
 
         [Fact]
@@ -224,7 +224,7 @@ namespace Divverence.MarbleTesting.Tests
             var actual = MarbleParser.ParseSequence("ab<cd>").ToList();
             actual.Select(m => string.Concat(m.Marbles)).Should().Equal("a", "b", "cd");
             actual.Select(m => m.Time).Should().Equal(0, 1, 2);
-            actual[2].IsOrderedGroup.Should().BeFalse();
+            actual[2].Type.Should().Be(Moment.MomentType.UnorderedGroup);
         }
 
         [Fact]
