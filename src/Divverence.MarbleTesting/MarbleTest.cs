@@ -114,11 +114,11 @@ namespace Divverence.MarbleTesting
             private bool EventExpected(int eventIndex) => Results.Any(r => r[eventIndex].Succeeded);
         }
 
+        private static Func<string, IEnumerable<Moment>> _parseSequenceFunc;
         private readonly Func<TimeSpan, Task> _fastForward;
         private readonly Func<Task> _waitForIdle;
         protected List<ExpectedMarbles> Expectations = new List<ExpectedMarbles>();
         protected List<InputMarbles> Inputs = new List<InputMarbles>();
-        private static Func<string, IEnumerable<Moment>> _parseSequenceFunc;
 
         public MarbleTest(
             Func<Task> waitForIdle,
@@ -129,8 +129,6 @@ namespace Divverence.MarbleTesting
             _fastForward = fastForward;
             _parseSequenceFunc = parserFunc ?? MarbleParser.ParseSequence;
         }
-
-        private Task SystemIdle => _waitForIdle();
 
         public async Task Run(TimeSpan? interval = null)
         {
@@ -154,7 +152,13 @@ namespace Divverence.MarbleTesting
             Inputs.Add(new InputMarbles(sequence, actions));
         }
 
-        public void AddExpectations(ExpectedMarbles marbles) => Expectations.Add(marbles);
+#pragma warning disable 1998 // Seems the best way to convert Action<string> into a Func<string,Task> ...
+
+
+        public void WhenDoing(string sequence, Action<string> whatToDo)
+            => WhenDoing(sequence, async marble => whatToDo(marble));
+
+#pragma warning restore 1998
 
         public void Expect<TEvent>(
             string sequence,
@@ -163,11 +167,22 @@ namespace Divverence.MarbleTesting
         {
             var expectations = ParseSequence(sequence)
                 .SelectMany(moment => CreateExpectations(moment, eventProducer, assertion));
-            AddExpectations(new ExpectedMarbles(sequence, expectations));
-
+            Expectations.Add(new ExpectedMarbles(sequence, expectations));
         }
 
-        private IEnumerable<ExpectedMarble> CreateExpectations<TEvent>(
+        protected IEnumerable<InputMarble> CreateInputMarbles(Moment moment, Func<string, Task> whatToDo) =>
+            moment.Marbles.Select(marble => new InputMarble(moment.Time, marble, () => whatToDo(marble)));
+
+        protected static IEnumerable<Moment> ParseSequence(string sequence) =>
+            _parseSequenceFunc(sequence);
+
+        private Task FastForward(TimeSpan howMuch) =>
+            _fastForward(howMuch);
+
+        private Task SystemIdle =>
+            _waitForIdle();
+
+        private static IEnumerable<ExpectedMarble> CreateExpectations<TEvent>(
             Moment moment,
             Func<FSharpOption<TEvent>> eventProducer,
             Action<string, TEvent> assertion)
@@ -183,121 +198,141 @@ namespace Divverence.MarbleTesting
                     momentMarbles.Add(CreateSingleExpectedMarble(moment, eventProducer, assertion, marble));
                     break;
                 case Moment.MomentType.OrderedGroup:
-                    momentMarbles.Add(new ExpectedMarble(moment.Time, moment.ToString(), () =>
-                    {
-                        var produced = moment.Marbles.Select(_ => eventProducer()).ToList();
-                        var received = produced.Where(FSharpOption<TEvent>.get_IsSome).Select(t => t.Value).ToList();
-                        if (received.Count < moment.Marbles.Length)
-                        {
-                            throw new MissingEventException(
-                                $"At time {moment.Time}, expecting an ordered group {moment} with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
-                        }
-
-
-                        var exceptions = received.Zip(moment.Marbles, (@event, m) => CheckEvent(assertion, m, @event))
-                            .Where(t => !t.Succeeded)
-                            .Select(t => (t.Event, t.Expection, t.Marble)).ToList();
-                        if (exceptions.Any())
-                        {
-                            var failures = string.Join($"{Environment.NewLine}- ",
-                                exceptions.Select(e => $"Marble '{e.Marble}', event '{e.Event}', failure:{Environment.NewLine}    {e.Expection.Message}"));
-                            throw new Exception(
-                                $"At time {moment.Time}, expecting an ordered group {moment} with {moment.Marbles.Length} elements but {exceptions.Count} " +
-                                "events failed their assertion: " +
-                                $"{Environment.NewLine}- {failures}");
-                        }
-                    }));
+                    momentMarbles.Add(CreateOrderedGroupExpectedMarble(moment, eventProducer, assertion));
                     break;
                 case Moment.MomentType.UnorderedGroup:
-                    momentMarbles.Add(new ExpectedMarble(moment.Time, moment.ToString(), () =>
-                    {
-                        var produced = moment.Marbles.Select(_ => eventProducer()).ToList();
-                        var received = produced.Where(FSharpOption<TEvent>.get_IsSome).Select(t => t.Value).ToList();
-                        if (received.Count != moment.Marbles.Length)
-                        {
-                            throw new Exception(
-                                $"At time {moment.Time}, expecting an unordered group {moment} with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
-                        }
-
-                        var table = new MarbleEventAssertionResultTable();
-                        foreach (var m in moment.Marbles)
-                        {
-                            var row = new List<MarbleEventAssertionResultTable.Result>();
-                            foreach (var @event in received)
-                            {
-                                var (succeeded, exception, _, _) = CheckEvent(assertion, m, @event);
-                                row.Add(new MarbleEventAssertionResultTable.Result(m, @event, succeeded ? string.Empty : exception.Message));
-                            }
-                            table.Results.Add(row);
-                        }
-
-                        var success = table.AllRowsAtLeastOneSuccess() && table.AllColumnsAtLeastOneSuccess();
-                        if (!success)
-                        {
-                            throw new Exception(table.ToString());
-                        }
-                    }));
+                    momentMarbles.Add(CreateUnorderedGroupExpectedMarble(moment, eventProducer, assertion));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-
             momentMarbles.Add(nothingElseMarble);
             return momentMarbles;
         }
 
-        private static ExpectedMarble CreateSingleExpectedMarble<TEvent>(Moment moment, Func<FSharpOption<TEvent>> eventProducer, Action<string, TEvent> assertion, string marble)
-        {
-            return new ExpectedMarble(moment.Time, marble, () =>
-            {
-                var option = eventProducer();
-                if (FSharpOption<TEvent>.get_IsSome(option))
-                {
-                    assertion(marble, option.Value);
-                }
-                else
-                {
-                    throw new MissingEventException($"At time {moment.Time}, an event for '{marble}' was expected, but there was no event");
-                }
-            });
-        }
+        private static ExpectedMarble CreateUnorderedGroupExpectedMarble<TEvent>(
+            Moment moment,
+            Func<FSharpOption<TEvent>> eventProducer,
+            Action<string, TEvent> assertion) =>
+                new ExpectedMarble(
+                    moment.Time,
+                    moment.ToString(),
+                    () =>
+                        {
+                            var produced = moment.Marbles.Select(_ => eventProducer()).ToList();
+                            var received = produced.Where(FSharpOption<TEvent>.get_IsSome).Select(t => t.Value).ToList();
+                            if (received.Count != moment.Marbles.Length)
+                            {
+                                throw new Exception(
+                                    $"At time {moment.Time}, expecting an unordered group {moment} with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
+                            }
 
-        private static Action ExpectNothing<TEvent>(Func<FSharpOption<TEvent>> eventProducer, Moment moment)
-        {
-            return () =>
-            {
-                var received = new List<TEvent>();
-                FSharpOption<TEvent> produced;
-                while (FSharpOption<TEvent>.get_IsSome(produced = eventProducer()))
+                            var table = new MarbleEventAssertionResultTable();
+                            foreach (var m in moment.Marbles)
+                            {
+                                var row = new List<MarbleEventAssertionResultTable.Result>();
+                                foreach (var @event in received)
+                                {
+                                    var (succeeded, exception, _, _) = CheckEvent(assertion, m, @event);
+                                    row.Add(new MarbleEventAssertionResultTable.Result(m, @event, succeeded ? string.Empty : exception.Message));
+                                }
+                                table.Results.Add(row);
+                            }
+
+                            var success = table.AllRowsAtLeastOneSuccess() && table.AllColumnsAtLeastOneSuccess();
+                            if (!success)
+                            {
+                                throw new Exception(table.ToString());
+                            }
+                        });
+
+        private static ExpectedMarble CreateOrderedGroupExpectedMarble<TEvent>(
+            Moment moment,
+            Func<FSharpOption<TEvent>> eventProducer,
+            Action<string, TEvent> assertion) =>
+                new ExpectedMarble(
+                    moment.Time,
+                    moment.ToString(),
+                    () =>
+                        {
+                            var produced = moment.Marbles.Select(_ => eventProducer()).ToList();
+                            var received = produced.Where(FSharpOption<TEvent>.get_IsSome).Select(t => t.Value).ToList();
+                            if (received.Count < moment.Marbles.Length)
+                            {
+                                throw new MissingEventException(
+                                    $"At time {moment.Time}, expecting an ordered group {moment} with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
+                            }
+
+
+                            var exceptions = received.Zip(moment.Marbles, (@event, m) => CheckEvent(assertion, m, @event))
+                                .Where(t => !t.Succeeded)
+                                .Select(t => (t.Event, t.Expection, t.Marble)).ToList();
+                            if (exceptions.Any())
+                            {
+                                var failures = string.Join($"{Environment.NewLine}- ",
+                                    exceptions.Select(e => $"Marble '{e.Marble}', event '{e.Event}', failure:{Environment.NewLine}    {e.Expection.Message}"));
+                                throw new Exception(
+                                    $"At time {moment.Time}, expecting an ordered group {moment} with {moment.Marbles.Length} elements but {exceptions.Count} " +
+                                    "events failed their assertion: " +
+                                    $"{Environment.NewLine}- {failures}");
+                            }
+                        });
+
+        private static ExpectedMarble CreateSingleExpectedMarble<TEvent>(
+            Moment moment,
+            Func<FSharpOption<TEvent>> eventProducer,
+            Action<string, TEvent> assertion,
+            string marble) =>
+                new ExpectedMarble(
+                    moment.Time,
+                    marble,
+                    () =>
+                        {
+                            var option = eventProducer();
+                            if (FSharpOption<TEvent>.get_IsSome(option))
+                            {
+                                assertion(marble, option.Value);
+                            }
+                            else
+                            {
+                                throw new MissingEventException($"At time {moment.Time}, an event for '{marble}' was expected, but there was no event");
+                            }
+                        });
+
+        private static Action ExpectNothing<TEvent>(Func<FSharpOption<TEvent>> eventProducer, Moment moment) =>
+            () =>
                 {
-                    received.Add(produced.Value);
-                }
-                if (received.Any())
-                {
-                    var receivedList = string.Join(", ", received);
-                    string message;
-                    switch (moment.Type)
+                    var received = new List<TEvent>();
+                    FSharpOption<TEvent> produced;
+                    while (FSharpOption<TEvent>.get_IsSome(produced = eventProducer()))
                     {
-                        case Moment.MomentType.Empty:
-                            message = $"At time {moment.Time}, expected no events but received [{receivedList}]";
-                            break;
-                        case Moment.MomentType.Single:
-                            message = $"At time {moment.Time}, expected a single event for marble '{moment}' but received [{receivedList}]";
-                            break;
-                        case Moment.MomentType.OrderedGroup:
-                            message = $"At time {moment.Time}, expected ordered group '{moment}' but received superfluous events [{receivedList}]";
-                            break;
-                        case Moment.MomentType.UnorderedGroup:
-                            message = $"At time {moment.Time}, expected unordered group '{moment}' but received superfluous events [{receivedList}]";
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        received.Add(produced.Value);
                     }
-                    throw new UnexpectedEventsException(message);
-                }
-            };
-        }
+                    if (received.Any())
+                    {
+                        var receivedList = string.Join(", ", received);
+                        string message;
+                        switch (moment.Type)
+                        {
+                            case Moment.MomentType.Empty:
+                                message = $"At time {moment.Time}, expected no events but received [{receivedList}]";
+                                break;
+                            case Moment.MomentType.Single:
+                                message = $"At time {moment.Time}, expected a single event for marble '{moment}' but received [{receivedList}]";
+                                break;
+                            case Moment.MomentType.OrderedGroup:
+                                message = $"At time {moment.Time}, expected ordered group '{moment}' but received superfluous events [{receivedList}]";
+                                break;
+                            case Moment.MomentType.UnorderedGroup:
+                                message = $"At time {moment.Time}, expected unordered group '{moment}' but received superfluous events [{receivedList}]";
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                        throw new UnexpectedEventsException(message);
+                    }
+                };
 
         private static (bool Succeeded, Exception Expection, string Marble, TEvent Event) CheckEvent<TEvent>(
             Action<string, TEvent> assertion,
@@ -313,86 +348,6 @@ namespace Divverence.MarbleTesting
             {
                 return (false, e, marble, top);
             }
-        }
-        private static (bool Succeeded, IList<Exception>, string Marble) CheckEvent<TEvent>(
-            Action<string, TEvent> assertion,
-            TEvent top,
-            ICollection<string> toCheck)
-        {
-            var exceptions = new List<Exception>();
-            var localCopy = toCheck.ToArray();
-            foreach (var marble in localCopy)
-            {
-                try
-                {
-                    assertion(marble, top);
-                    toCheck.Remove(marble);
-                    return (true, null, marble);
-                }
-                catch (Exception e)
-                {
-                    exceptions.Add(e);
-                }
-            }
-
-            return (false, exceptions, "?");
-        }
-
-        public void Expect(
-            string sequence,
-            Func<string, Action> assertionFactory,
-            Action nothingElseAssertion,
-            Func<Moment, ExpectedMarble> unorderedGroupExpectationCreator) =>
-                Expect(
-                    sequence,
-                    assertionFactory,
-                    nothingElseAssertion,
-                    m => Enumerable.Repeat(unorderedGroupExpectationCreator(m), 1));
-
-        public void Expect(
-            string sequence,
-            Func<string, Action> assertionFactory,
-            Action nothingElseAssertion,
-            Func<Moment, IEnumerable<ExpectedMarble>> unorderedGroupExpectationsCreator = null)
-        {
-            var expectations = ParseSequence(sequence)
-                .SelectMany(moment => CreateExpectations(moment, assertionFactory, nothingElseAssertion, unorderedGroupExpectationsCreator));
-            AddExpectations(new ExpectedMarbles(sequence, expectations));
-        }
-
-        protected static IEnumerable<ExpectedMarble> CreateExpectations(
-            Moment moment,
-            Func<string, Action> assertionFactory,
-            Action nothingElseAssertion,
-            Func<Moment, IEnumerable<ExpectedMarble>> unorderedGroupExpectationsCreator = null)
-        {
-            if (moment.Type == Moment.MomentType.UnorderedGroup)
-            {
-                if (unorderedGroupExpectationsCreator == null)
-                    throw new NotImplementedException();
-                return unorderedGroupExpectationsCreator(moment);
-            }
-            return moment.Marbles
-                .Select(
-                    marble =>
-                        new ExpectedMarble(moment.Time, marble, assertionFactory(marble)))
-                .Concat(Enumerable.Repeat(new ExpectedMarble(moment.Time, null, nothingElseAssertion), 1));
-        }
-
-        protected static IEnumerable<Moment> ParseSequence(string sequence)
-        {
-            return _parseSequenceFunc(sequence);
-        }
-#pragma warning disable 1998 // Seems the best way to convert Action<string> into a Func<string,Task> ...
-        public void WhenDoing(string sequence, Action<string> whatToDo)
-            => WhenDoing(sequence, async marble => whatToDo(marble));
-#pragma warning restore 1998
-
-        private Task FastForward(TimeSpan howMuch) => _fastForward(howMuch);
-
-        protected IEnumerable<InputMarble> CreateInputMarbles(Moment moment, Func<string, Task> whatToDo)
-        {
-            return moment.Marbles.Select(marble => new InputMarble(moment.Time, marble, () => whatToDo(marble)));
         }
     }
 }

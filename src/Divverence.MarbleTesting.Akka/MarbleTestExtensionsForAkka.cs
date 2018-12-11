@@ -26,17 +26,17 @@ namespace Divverence.MarbleTesting.Akka
             this MarbleTest marbleTest,
             string sequence,
             TestProbe probe,
-            Func<string, Action<T>> assertionFactory) =>
+            Action<string, T> assertion) =>
                 marbleTest.Expect(
                     sequence,
                     probe.EventProducer<T>(),
-                    (m, ev) => assertionFactory(m)(ev));
+                    assertion);
 
         public static void ExpectMsgs(
             this MarbleTest marbleTest,
             string sequence,
             TestProbe probe,
-            Func<string, Action<object>> assertion) =>
+            Action<string, object> assertion) =>
                 marbleTest.ExpectMsgs<object>(
                     sequence,
                     probe,
