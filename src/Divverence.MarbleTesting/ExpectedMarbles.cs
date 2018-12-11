@@ -23,30 +23,7 @@ namespace Divverence.MarbleTesting
         public void Verify(int time)
         {
             var expectations = Expectations.Where(e => e.Time == time).Where(e => e.Marble != null).ToList();
-            if (!expectations.Any())
-                return;
-
-            foreach (var exp in expectations)
-                try
-                {
-                    exp.Assertion();
-                }
-                catch (MissingEventException me)
-                {
-                    throw new Exception(
-                        $"At time {time}, marble '{exp.Marble}' did not receive all expected events {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{me.Message}.", me);
-                }
-                catch (UnexpectedEventsException me)
-                {
-                    throw new Exception(
-                        $"At time {time}, marble '{exp.Marble}' received unexpected events {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{me.Message}.", me);
-                }
-
-                catch (Exception e)
-                {
-                    throw new Exception(
-                        $"Expected marble '{exp.Marble}' at time {time} was not satisfied {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}.", e);
-                }
+            InvokeAssertions(time, expectations);
         }
 
         public void VerifyNothingElse(int time)
@@ -62,9 +39,39 @@ namespace Divverence.MarbleTesting
                 }
                 catch (Exception e)
                 {
-                    if (exp.Marble == null)
-                        throw new Exception(
-                            $"Unexpected event received at time {time} in sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}.", e);
+                    throw new Exception(
+                        $"At time {time}, unexpected events were received {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}.", e);
+                }
+        }
+
+        private void InvokeAssertions(int time, List<ExpectedMarble> expectations)
+        {
+            if (!expectations.Any())
+                return;
+
+            foreach (var exp in expectations)
+                try
+                {
+                    exp.Assertion();
+                }
+                catch (MissingEventException mee)
+                {
+                    throw new Exception(
+                        $"At time {time}, for marble '{exp.Marble}' not all expected events were received {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{mee.Message}.",
+                        mee);
+                }
+                catch (UnexpectedEventsException uee)
+                {
+                    throw new Exception(
+                        $"At time {time}, for marble '{exp.Marble}' unexpected events were received {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{uee.Message}.",
+                        uee);
+                }
+
+                catch (Exception e)
+                {
+                    throw new Exception(
+                        $"At time {time}, for marble '{exp.Marble}' its assertion was not satisfied {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}.",
+                        e);
                 }
         }
     }

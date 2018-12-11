@@ -15,114 +15,94 @@ namespace Divverence.MarbleTesting.Tests
             _marbleTest = new MarbleTest(() => Task.FromResult(true), _ => Task.FromResult(true), MultiCharMarbleParser.ParseSequence);
         }
 
-        [Fact]
-        public async Task ExpectShouldDetectNoEvent()
+        private Func<Task> RunMableTest
         {
-            var eventProducer = CreateProducer(null, null, null);
-            _marbleTest.Expect(
-                "-a-",
-                eventProducer,
-                MarbleShouldEqualActual);
-            await _marbleTest.Run();
+            get { return () => _marbleTest.Run(); }
         }
 
         [Fact]
-        public async Task ExpectShouldDetectUnexpectedEvents()
-        {
-            var eventProducer = CreateProducer("a", "b");
-            _marbleTest.Expect(
-                "-",
-                eventProducer,
-                MarbleShouldEqualActual);
-            await _marbleTest.Run();
-        }
+        public void ExpectShouldDetectNoEvent() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: "marble 'a' not all expected events were received",
+                sequence: "-a-",
+                null, null, null);
 
         [Fact]
-        public async Task ExpectShouldDistinguishNoEventFromWrongEvent()
-        {
-            var eventProducer = CreateProducer(null, "b", null);
-            _marbleTest.Expect(
-                "-a-",
-                eventProducer,
-                MarbleShouldEqualActual);
-            await _marbleTest.Run();
-        }
+        public void ExpectShouldDetectUnexpectedEvents() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: "unexpected events were received",
+                sequence: "-",
+                "a", "b");
 
         [Fact]
-        public async Task ExpectShouldHandleUnorderedGroups()
-        {
-            var eventProducer = CreateProducer(null, "Fred", "Wilma", "BamBam", "Barney", null);
-            _marbleTest.Expect(
-                "-<Fred Barney Wilma Rubbles>-",
-                eventProducer,
-                MarbleShouldEqualActual);
-            await _marbleTest.Run();
-        }
+        public void ExpectShouldFailWhenWrongEventIsReceived() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: "marble 'a' its assertion was not satisfied",
+                sequence: "-a-",
+                null, "b", null);
 
         [Fact]
-        public async Task ExpectShouldHandleUnorderedGroupsWithNotEnoughEvents()
-        {
-            var eventProducer = CreateProducer(null, "a", null);
-            _marbleTest.Expect(
-                "-<a b>-",
-                eventProducer,
-                MarbleShouldEqualActual);
-            await _marbleTest.Run();
-        }
+        public void ExpectShouldHandleUnorderedGroups() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: "its assertion was not satisfied",
+                sequence: "-<Fred Barney Wilma Rubbles>-",
+                null, "Fred", "Wilma", "BamBam", "Barney", null);
 
         [Fact]
-        public async Task ExpectShouldHandleOrderedGroupsWithNonMatchingSecond()
-        {
-            var eventProducer = CreateProducer(null, "a", "c", null);
-            _marbleTest.Expect(
-                "-(a b)-",
-                eventProducer,
-                MarbleShouldEqualActual);
-            await _marbleTest.Run();
-        }
+        public void ExpectShouldHandleUnorderedGroupsWithNotEnoughEvents() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: "its assertion was not satisfied",
+                sequence: "-<a b>-",
+                null, "a", null);
 
         [Fact]
-        public async Task ExpectShouldHandleOrderedGroups()
-        {
-            var eventProducer = CreateProducer(null, "b", "a", null);
-            _marbleTest.Expect(
-                "-(a b)-",
-                eventProducer,
-                MarbleShouldEqualActual);
-            await _marbleTest.Run();
-        }
+        public void ExpectShouldHandleOrderedGroupsWithNonMatchingSecond() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: "its assertion was not satisfied",
+                sequence: "-(a b)-",
+                null, "a", "c", null);
 
         [Fact]
-        public async Task ExpectShouldHandleOrderedGroupsWhenNotEnoughElementsAreGiven()
-        {
-            var eventProducer = CreateProducer(null, "a", null, null);
-            _marbleTest.Expect(
-                "-(a b)-",
-                eventProducer,
-                MarbleShouldEqualActual);
-            await _marbleTest.Run();
-        }
+        public void ExpectShouldHandleOrderedGroups() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: "its assertion was not satisfied",
+                sequence: "-(a b)-",
+                null, "b", "a", null);
 
         [Fact]
-        public async Task ExpectShouldHandleUnorderedGroupsAndNothingElseAssertion()
-        {
-            var eventProducer = CreateProducer(null, "a", "b", "c", null);
-            _marbleTest.Expect(
-                "-<a b>-",
-                eventProducer,
-                MarbleShouldEqualActual);
-            await _marbleTest.Run();
-        }
+        public void ExpectShouldHandleOrderedGroupsWhenNotEnoughElementsAreGiven() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: "not all expected events were received",
+                sequence: "-(a b)-",
+                null, "a", null, null);
 
         [Fact]
-        public async Task ExpectShouldHandleOrderedGroupsAndNothingElseAssertion()
+        public void ExpectShouldHandleUnorderedGroupsAndNothingElseAssertion() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: " unexpected events were received",
+                sequence: "-<a b>-",
+                null, "a", "b", "c", null);
+
+        [Fact]
+        public void ExpectShouldHandleOrderedGroupsAndNothingElseAssertion() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: " unexpected events were received",
+                sequence: "-(a b)-",
+                null, "a", "b", "c", null);
+
+        private void AssertDiagnosedFailure(
+            string expectMessageToContain,
+            string sequence,
+            params string[] toProduce)
         {
-            var eventProducer = CreateProducer(null, "a", "b", "c", null);
+            var eventProducer = CreateProducer(toProduce);
             _marbleTest.Expect(
-                "-(a b)-",
+                sequence,
                 eventProducer,
                 MarbleShouldEqualActual);
-            await _marbleTest.Run();
+            RunMableTest.Should().Throw<Exception>()
+                .And
+                .Message.Should().Contain(expectMessageToContain);
         }
 
         private static Func<FSharpOption<string>> CreateProducer(params string[] toSend)
@@ -147,15 +127,6 @@ namespace Divverence.MarbleTesting.Tests
         private static void MarbleShouldEqualActual(string marble, string actual)
         {
             actual.Should().Be(marble);
-        }
-
-        private static void Fail()
-        {
-            true.Should().BeFalse("no event expected");
-        }
-
-        private static void Ignore()
-        {
         }
     }
 }

@@ -190,7 +190,7 @@ namespace Divverence.MarbleTesting
                         if (received.Count < moment.Marbles.Length)
                         {
                             throw new MissingEventException(
-                                $"Expecting an ordered group at moment '{moment}' with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
+                                $"At time {moment.Time}, expecting an ordered group {moment} with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
                         }
 
 
@@ -202,7 +202,7 @@ namespace Divverence.MarbleTesting
                             var failures = string.Join($"{Environment.NewLine}- ",
                                 exceptions.Select(e => $"Marble '{e.Marble}', event '{e.Event}', failure:{Environment.NewLine}    {e.Expection.Message}"));
                             throw new Exception(
-                                $"Expecting an ordered group '{moment}' with {moment.Marbles.Length} elements but {exceptions.Count} " +
+                                $"At time {moment.Time}, expecting an ordered group {moment} with {moment.Marbles.Length} elements but {exceptions.Count} " +
                                 "events failed their assertion: " +
                                 $"{Environment.NewLine}- {failures}");
                         }
@@ -216,7 +216,7 @@ namespace Divverence.MarbleTesting
                         if (received.Count != moment.Marbles.Length)
                         {
                             throw new Exception(
-                                $"Expecting an unordered group at moment '{moment}' with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
+                                $"At time {moment.Time}, expecting an unordered group {moment} with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
                         }
 
                         var table = new MarbleEventAssertionResultTable();
@@ -258,7 +258,7 @@ namespace Divverence.MarbleTesting
                 }
                 else
                 {
-                    throw new MissingEventException($"Expecting an event for '{marble}' at moment '{moment.Time}', but there was no event");
+                    throw new MissingEventException($"At time {moment.Time}, an event for '{marble}' was expected, but there was no event");
                 }
             });
         }
@@ -280,16 +280,16 @@ namespace Divverence.MarbleTesting
                     switch (moment.Type)
                     {
                         case Moment.MomentType.Empty:
-                            message = $"Expecting no events for marble '{moment}' at moment '{moment.Time}' but received [{receivedList}]";
+                            message = $"At time {moment.Time}, expected no events but received [{receivedList}]";
                             break;
                         case Moment.MomentType.Single:
-                            message = $"Expecting single event for marble '{moment}' at moment '{moment.Time}' but received [{receivedList}]";
+                            message = $"At time {moment.Time}, expected a single event for marble '{moment}' but received [{receivedList}]";
                             break;
                         case Moment.MomentType.OrderedGroup:
-                            message = $"Expecting an ordered set of events for marble '{moment}' at moment '{moment.Time}' but received superfluous events [{receivedList}]";
+                            message = $"At time {moment.Time}, expected ordered group '{moment}' but received superfluous events [{receivedList}]";
                             break;
                         case Moment.MomentType.UnorderedGroup:
-                            message = $"Expecting an unordered set of events for marble '{moment}' at moment '{moment.Time}' but received superfluous events [{receivedList}]";
+                            message = $"At time {moment.Time}, expected unordered group '{moment}' but received superfluous events [{receivedList}]";
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
