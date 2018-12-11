@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <!-- BUILD -->
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;net452</TargetFrameworks>
@@ -10,7 +10,11 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <!-- *REF FRAMEWORK* -->
+  <ItemGroup>
+  </ItemGroup>
   <!-- *REF NUGET PACKAGES* -->
+  <ItemGroup>
+  </ItemGroup>
   <!-- *REF PROJECTS* -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj" />

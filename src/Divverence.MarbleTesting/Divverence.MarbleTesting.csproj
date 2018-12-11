@@ -4,6 +4,7 @@
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <IsPackable>true</IsPackable>
+    <RelativePublishBinDir>bin</RelativePublishBinDir>
   </PropertyGroup>
   <!-- *SPECIFICS* -->
   <PropertyGroup>
@@ -11,10 +12,13 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <!-- *REF FRAMEWORK* -->
+  <ItemGroup>
+  </ItemGroup>
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.5.4" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <!-- *REF PROJECTS* -->
   <ItemGroup>
@@ -25,8 +29,5 @@
   <!-- EMBED SOURCES -->
   <ItemGroup>
     <EmbeddedFiles Include="@(Compile)" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 </Project>

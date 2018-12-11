@@ -17,7 +17,7 @@ pipeline {
     }
     post {
         always {
-           step([$class: 'MSTestPublisher', testResultsFile: '**/testresults*.xml', failOnError: true, keepLongStdio: true])
+           step([$class: 'MSTestPublisher', testResultsFile: '**/testresults*.xml', failOnError: false, keepLongStdio: true])
         }
         success {
             script {
