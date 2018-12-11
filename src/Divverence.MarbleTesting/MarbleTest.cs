@@ -35,86 +35,83 @@ namespace Divverence.MarbleTesting
             public override string ToString()
             {
                 var result = new StringBuilder();
+                var toDumpFailures = AppendFailureTable(result);
+                result.AppendLine();
+                AppendEventLegend(result);
+                result.AppendLine();
+                AppendFailures(toDumpFailures, result);
+                return result.ToString();
+            }
+
+            private List<(string FailureId, string FailureMessage)> AppendFailureTable(StringBuilder result)
+            {
+                var marbleColumnLength = Results.Max(row => row[0].Marble.Length);
+                var toDumpFailures = new List<(string FailureId, string FailureMessage)>();
+                var errorIndex = 'a';
                 result.AppendLine("Summary:");
-                result.AppendLine("     " + string.Join("    ", Results.Select((row, index) => $"e_{index}")));
+                result.Append(new string(' ', marbleColumnLength + 1));
+                result.AppendLine(string.Join("   ", Results.Select((row, index) => $"e{index}")));
                 for (var rowIndex = 0; rowIndex < Results.Count; rowIndex++)
                 {
-                    result.Append("m_");
-                    result.Append(rowIndex);
-                    result.Append("  ");
                     var row = Results[rowIndex];
+                    result.AppendFormat($"{{0,{marbleColumnLength}}} ", row[0].Marble);
+                    var wasMarbleSatisfied = row.Any(c => c.Succeeded);
                     for (var i = 0; i < row.Count; i++)
                     {
-                        var cell = row[i].Succeeded ? "✔     " : $"x_{rowIndex}_{i}  ";
-                        result.Append(cell);
-                        if (i == (row.Count - 1))
-                        {
-                            result.AppendLine();
-                        }
+                        errorIndex = AppendCell(i, wasMarbleSatisfied, row, errorIndex, toDumpFailures, result);
                     }
                 }
-                result.AppendLine();
-                result.AppendLine("Marbles:");
-                for (var rowIndex = 0; rowIndex < Results.Count; rowIndex++)
+
+                return toDumpFailures;
+            }
+
+            private static void AppendFailures(List<(string FailureId, string FailureMessage)> toDumpFailures, StringBuilder result)
+            {
+                result.AppendLine("Failure messages:");
+                foreach (var (failureId, failureMessage) in toDumpFailures)
                 {
-                    var row = Results[rowIndex];
-                    result.Append("m_");
-                    result.Append(rowIndex);
-                    result.Append(" : ");
-                    result.AppendLine(row[0].Marble);
+                    result.AppendLine($"{failureId}: {failureMessage}");
                 }
-                result.AppendLine();
+            }
+
+            private void AppendEventLegend(StringBuilder result)
+            {
                 result.AppendLine("Events:");
                 var firstRow = Results[0];
                 for (var i = 0; i < firstRow.Count; i++)
                 {
-                    result.Append("e_");
-                    result.Append(i);
-                    result.Append(" : ");
-                    result.AppendLine(firstRow[i].Event.ToString());
+                    result.AppendLine($"e{i} : {firstRow[i].Event}");
                 }
-
-                result.AppendLine();
-                result.AppendLine("Failure messages:");
-                for (var rowIndex = 0; rowIndex < Results.Count; rowIndex++)
-                {
-                    var row = Results[rowIndex];
-                    for (var i = 0; i < row.Count; i++)
-                    {
-                        if (!row[i].Succeeded)
-                        {
-                            result.AppendLine($"x_{rowIndex}_{i} : {row[i].AssertionExceptionMessage}");
-                        }
-                    }
-
-                }
-                return result.ToString();
             }
 
-            public bool AllRowsAtLeastOneSuccess()
+            private char AppendCell(
+                int columnIndex,
+                bool wasMarbleSatisfied, List<Result> row, char errorIndex, List<(string FailureId, string FailureMessage)> toDumpFailures,
+                StringBuilder result)
             {
-                return Results.All(row => row.Count(c => c.Succeeded) >= 1);
-            }
-
-            public bool AllCollumnsAtLeastOneSuccess()
-            {
-                var collums = new List<List<bool>>();
-                for (var rowIndex = 0; rowIndex < Results.Count; rowIndex++)
+                var eventWasExpected = EventExpected(columnIndex);
+                var problem = !(eventWasExpected && wasMarbleSatisfied);
+                var cell = row[columnIndex].Succeeded ? "✔ " : !problem ? "❌ " : $"❌{errorIndex++}";
+                if (problem)
                 {
-                    var row = Results[rowIndex];
-                    for (var i = 0; i < row.Count; i++)
-                    {
-                        if (collums.Count < i)
-                        {
-                            collums.Add(new List<bool>(Results.Count));
-                        }
-
-                        collums[i][rowIndex] = row[i].Succeeded;
-                    }
+                    toDumpFailures.Add((cell, row[columnIndex].AssertionExceptionMessage));
                 }
 
-                return collums.All(c => c.Count(r => r) >= 1);
+                result.Append(cell);
+                result.Append("  ");
+                if (columnIndex == row.Count - 1)
+                {
+                    result.AppendLine();
+                }
+
+                return errorIndex;
             }
+
+            public bool AllRowsAtLeastOneSuccess() => Results.All(row => row.Count(c => c.Succeeded) >= 1);
+
+            public bool AllColumnsAtLeastOneSuccess() => Enumerable.Range(0, Results[0].Count).All(i => Results.Any(r => r[i].Succeeded));
+
+            private bool EventExpected(int eventIndex) => Results.Any(r => r[eventIndex].Succeeded);
         }
 
         private readonly Func<TimeSpan, Task> _fastForward;
@@ -175,7 +172,7 @@ namespace Divverence.MarbleTesting
             Func<FSharpOption<TEvent>> eventProducer,
             Action<string, TEvent> assertion)
         {
-            var nothingElseMarble = new ExpectedMarble(moment.Time, null, ExpectNothing(eventProducer));
+            var nothingElseMarble = new ExpectedMarble(moment.Time, null, ExpectNothing(eventProducer, moment));
             var momentMarbles = new List<ExpectedMarble>();
             switch (moment.Type)
             {
@@ -183,16 +180,16 @@ namespace Divverence.MarbleTesting
                     break;
                 case Moment.MomentType.Single:
                     var marble = moment.Marbles[0];
-                    momentMarbles.Add(CreateSinglExpectedMarble(moment, eventProducer, assertion, marble));
+                    momentMarbles.Add(CreateSingleExpectedMarble(moment, eventProducer, assertion, marble));
                     break;
                 case Moment.MomentType.OrderedGroup:
                     momentMarbles.Add(new ExpectedMarble(moment.Time, moment.ToString(), () =>
                     {
                         var produced = moment.Marbles.Select(_ => eventProducer()).ToList();
                         var received = produced.Where(FSharpOption<TEvent>.get_IsSome).Select(t => t.Value).ToList();
-                        if (received.Count != moment.Marbles.Length)
+                        if (received.Count < moment.Marbles.Length)
                         {
-                            throw new Exception(
+                            throw new MissingEventException(
                                 $"Expecting an ordered group at moment '{moment}' with {moment.Marbles.Length} elements but got {received.Count} events: [{string.Join(" ", received)}]");
                         }
 
@@ -234,45 +231,10 @@ namespace Divverence.MarbleTesting
                             table.Results.Add(row);
                         }
 
-                        var success = table.AllRowsAtLeastOneSuccess() && table.AllCollumnsAtLeastOneSuccess();
+                        var success = table.AllRowsAtLeastOneSuccess() && table.AllColumnsAtLeastOneSuccess();
                         if (!success)
                         {
                             throw new Exception(table.ToString());
-                        }
-                        var events = new Queue<TEvent>(received);
-                        var toCheck = new List<string>(moment.Marbles);
-                        var succeededEvents = new List<TEvent>();
-                        var exceptions = new List<(TEvent Event, IList<Exception>, string Marble)>();
-                        while (events.Count > 0)
-                        {
-                            var top = events.Dequeue();
-                            var (succeeded, exceptionForEvent, m) = CheckEvent(assertion, top, toCheck);
-                            if (succeeded)
-                            {
-                                succeededEvents.Add(top);
-                            }
-                            else
-                            {
-                                exceptions.Add((top, exceptionForEvent, m));
-                            }
-                        }
-
-                        if (exceptions.Any())
-                        {
-                            var successes = succeededEvents.Count > 0
-                                ? $"Found marbles [{string.Join(", ", succeededEvents)}]"
-                                : string.Empty;
-                            var failures = string.Join($"{Environment.NewLine}- ",
-                                exceptions.Select(e =>
-                                {
-                                    var messages = string.Join($"{Environment.NewLine}    ",
-                                        e.Item2.Select(ex => ex.Message));
-                                    return $"Marble '{e.Marble}', event '{e.Event}', failures:{Environment.NewLine}    {messages}";
-                                }));
-                            throw new Exception(
-                                $"Expecting an unordered group '{moment}' with {moment.Marbles.Length} elements. {Environment.NewLine}{successes}{Environment.NewLine}{exceptions.Count} " +
-                                "marbles are missing: " +
-                                $"{Environment.NewLine}- {failures}{Environment.NewLine}{successes}");
                         }
                     }));
                     break;
@@ -285,7 +247,7 @@ namespace Divverence.MarbleTesting
             return momentMarbles;
         }
 
-        private static ExpectedMarble CreateSinglExpectedMarble<TEvent>(Moment moment, Func<FSharpOption<TEvent>> eventProducer, Action<string, TEvent> assertion, string marble)
+        private static ExpectedMarble CreateSingleExpectedMarble<TEvent>(Moment moment, Func<FSharpOption<TEvent>> eventProducer, Action<string, TEvent> assertion, string marble)
         {
             return new ExpectedMarble(moment.Time, marble, () =>
             {
@@ -296,20 +258,43 @@ namespace Divverence.MarbleTesting
                 }
                 else
                 {
-                    throw new Exception($"Expecting '{marble}' at moment '{moment.Time}', but there was no event.");
+                    throw new MissingEventException($"Expecting an event for '{marble}' at moment '{moment.Time}', but there was no event");
                 }
-
             });
         }
 
-        private static Action ExpectNothing<TEvent>(Func<FSharpOption<TEvent>> eventProducer)
+        private static Action ExpectNothing<TEvent>(Func<FSharpOption<TEvent>> eventProducer, Moment moment)
         {
             return () =>
             {
-                var option = eventProducer();
-                if (FSharpOption<TEvent>.get_IsSome(option))
+                var received = new List<TEvent>();
+                FSharpOption<TEvent> produced;
+                while (FSharpOption<TEvent>.get_IsSome(produced = eventProducer()))
                 {
-                    throw new Exception($"Expecting no event but received '{option.Value}'");
+                    received.Add(produced.Value);
+                }
+                if (received.Any())
+                {
+                    var receivedList = string.Join(", ", received);
+                    string message;
+                    switch (moment.Type)
+                    {
+                        case Moment.MomentType.Empty:
+                            message = $"Expecting no events for marble '{moment}' at moment '{moment.Time}' but received [{receivedList}]";
+                            break;
+                        case Moment.MomentType.Single:
+                            message = $"Expecting single event for marble '{moment}' at moment '{moment.Time}' but received [{receivedList}]";
+                            break;
+                        case Moment.MomentType.OrderedGroup:
+                            message = $"Expecting an ordered set of events for marble '{moment}' at moment '{moment.Time}' but received superfluous events [{receivedList}]";
+                            break;
+                        case Moment.MomentType.UnorderedGroup:
+                            message = $"Expecting an unordered set of events for marble '{moment}' at moment '{moment.Time}' but received superfluous events [{receivedList}]";
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    throw new UnexpectedEventsException(message);
                 }
             };
         }

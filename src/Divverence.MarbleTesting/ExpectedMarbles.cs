@@ -20,30 +20,40 @@ namespace Divverence.MarbleTesting
         public int LastTime { get; set; }
         public int FirstTime { get; set; }
 
-        public bool Verify(int time)
+        public void Verify(int time)
         {
             var expectations = Expectations.Where(e => e.Time == time).Where(e => e.Marble != null).ToList();
             if (!expectations.Any())
-                return false;
+                return;
 
             foreach (var exp in expectations)
                 try
                 {
                     exp.Assertion();
                 }
+                catch (MissingEventException me)
+                {
+                    throw new Exception(
+                        $"At time {time}, marble '{exp.Marble}' did not receive all expected events {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{me.Message}.", me);
+                }
+                catch (UnexpectedEventsException me)
+                {
+                    throw new Exception(
+                        $"At time {time}, marble '{exp.Marble}' received unexpected events {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{me.Message}.", me);
+                }
+
                 catch (Exception e)
                 {
                     throw new Exception(
-                        $"Expected marble '{exp.Marble}' at time {time} but got a different marble in sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}", e);
+                        $"Expected marble '{exp.Marble}' at time {time} was not satisfied {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}.", e);
                 }
-            return true;
         }
 
-        public bool VerifyNothingElse(int time)
+        public void VerifyNothingElse(int time)
         {
             var expectations = Expectations.Where(e => e.Time == time).Where(e => e.Marble == null).ToList();
             if (!expectations.Any())
-                return false;
+                return;
 
             foreach (var exp in expectations)
                 try
@@ -54,9 +64,8 @@ namespace Divverence.MarbleTesting
                 {
                     if (exp.Marble == null)
                         throw new Exception(
-                            $"Unexpected event received at time {time} in sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}", e);
+                            $"Unexpected event received at time {time} in sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}.", e);
                 }
-            return true;
         }
     }
 }

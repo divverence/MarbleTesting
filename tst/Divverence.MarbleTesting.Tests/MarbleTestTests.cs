@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
+using Microsoft.FSharp.Core;
 using System;
 using System.Threading.Tasks;
-using Microsoft.FSharp.Core;
 using Xunit;
 
 namespace Divverence.MarbleTesting.Tests
@@ -18,9 +18,20 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public async Task ExpectShouldDetectNoEvent()
         {
-            var eventProducer = CreateProducer(null,null, null);
+            var eventProducer = CreateProducer(null, null, null);
             _marbleTest.Expect(
                 "-a-",
+                eventProducer,
+                MarbleShouldEqualActual);
+            await _marbleTest.Run();
+        }
+
+        [Fact]
+        public async Task ExpectShouldDetectUnexpectedEvents()
+        {
+            var eventProducer = CreateProducer("a", "b");
+            _marbleTest.Expect(
+                "-",
                 eventProducer,
                 MarbleShouldEqualActual);
             await _marbleTest.Run();
@@ -40,9 +51,9 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public async Task ExpectShouldHandleUnorderedGroups()
         {
-            var eventProducer = CreateProducer(null, "a", "c", null);
+            var eventProducer = CreateProducer(null, "Fred", "Wilma", "BamBam", "Barney", null);
             _marbleTest.Expect(
-                "-<a b>-",
+                "-<Fred Barney Wilma Rubbles>-",
                 eventProducer,
                 MarbleShouldEqualActual);
             await _marbleTest.Run();
@@ -84,7 +95,7 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public async Task ExpectShouldHandleOrderedGroupsWhenNotEnoughElementsAreGiven()
         {
-            var eventProducer = CreateProducer(null,"a", null, null);
+            var eventProducer = CreateProducer(null, "a", null, null);
             _marbleTest.Expect(
                 "-(a b)-",
                 eventProducer,
@@ -95,9 +106,20 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public async Task ExpectShouldHandleUnorderedGroupsAndNothingElseAssertion()
         {
-            var eventProducer = CreateProducer(null, "a", null);
+            var eventProducer = CreateProducer(null, "a", "b", "c", null);
             _marbleTest.Expect(
                 "-<a b>-",
+                eventProducer,
+                MarbleShouldEqualActual);
+            await _marbleTest.Run();
+        }
+
+        [Fact]
+        public async Task ExpectShouldHandleOrderedGroupsAndNothingElseAssertion()
+        {
+            var eventProducer = CreateProducer(null, "a", "b", "c", null);
+            _marbleTest.Expect(
+                "-(a b)-",
                 eventProducer,
                 MarbleShouldEqualActual);
             await _marbleTest.Run();
@@ -108,10 +130,14 @@ namespace Divverence.MarbleTesting.Tests
             var index = 0;
             return () =>
             {
+                if (toSend.Length <= index)
+                {
+                    return FSharpOption<string>.None;
+                }
                 var s = toSend[index++];
                 if (s == null)
                 {
-                    return  FSharpOption<string>.None;
+                    return FSharpOption<string>.None;
                 }
 
                 return FSharpOption<string>.Some(s);
