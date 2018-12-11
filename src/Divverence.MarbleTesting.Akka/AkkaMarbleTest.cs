@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Akka.Actor;
+﻿using Akka.Actor;
 using Akka.Configuration;
 using Divverence.MarbleTesting.Akka.Async;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Divverence.MarbleTesting.Akka
 {
@@ -28,20 +28,20 @@ namespace Divverence.MarbleTesting.Akka
         }
 
         /// <summary>
-        /// Use this constructor if you don't want to use the Awaitable Dispatcher for fast async testing. Provide your own methods for 'waiting for idle' and fastforwarding.
+        /// Use this constructor if you don't want to use the Awaitable Dispatcher for fast async testing. Provide your own methods for 'waiting for idle' and fast-forwarding.
         /// </summary>
-        /// <param name="waitForIdle">Function that provides a Task that Run(..?) will await after issueing all actions, before verifying expectations</param>
-        /// <param name="fastForward">Function that provides a Task that Run(step) will await after veryfying expectations</param>
+        /// <param name="waitForIdle">Function that provides a Task that Run(..?) will await after issuing all actions, before verifying expectations</param>
+        /// <param name="fastForward">Function that provides a Task that Run(step) will await after verifying expectations</param>
         public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward) : this(waitForIdle, fastForward, MultiCharMarbleParser.ParseSequence)
         {
         }
 
         /// <summary>
-        /// Use this constructor if you don't want to use the Awaitable Dispatcher for fast async testing. Provide your own methods for 'waiting for idle' and fastforwarding.
+        /// Use this constructor if you don't want to use the Awaitable Dispatcher for fast async testing. Provide your own methods for 'waiting for idle' and fast-forwarding.
         /// You also want to provide a custom Marble Sequence Parser (eg. MultiCharMarbleParser.ParseSequence)
         /// </summary>
-        /// <param name="waitForIdle">Function that provides a Task that Run(..?) will await after issueing all actions, before verifying expectations</param>
-        /// <param name="fastForward">Function that provides a Task that Run(step) will await after veryfying expectations</param>
+        /// <param name="waitForIdle">Function that provides a Task that Run(..?) will await after issuing all actions, before verifying expectations</param>
+        /// <param name="fastForward">Function that provides a Task that Run(step) will await after verifying expectations</param>
         /// <param name="marbleParserFunc">Your Marble Sequence parser function</param>
         public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward,
             Func<string, IEnumerable<Moment>> marbleParserFunc) : base(waitForIdle, fastForward, marbleParserFunc)
