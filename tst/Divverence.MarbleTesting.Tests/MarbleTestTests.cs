@@ -90,6 +90,76 @@ namespace Divverence.MarbleTesting.Tests
                 sequence: "-(a b)-",
                 null, "a", "b", "c", null);
 
+        [Fact]
+        public void LooselyExpectShouldIgnoreUnexpectedEvents() => 
+            LooselyExpectSuccess(
+                "-", 
+                "b");
+
+        [Fact]
+        public void LooselyExpectShouldFailIfMarbleNotMatched() => 
+            LooselyExpectFailure(
+                "a", 
+                "b");
+
+        [Fact]
+        public void LooselyExpectShouldSucceedIfMarbleSatisfiedLater() => 
+            LooselyExpectSuccess(
+                "a", 
+                "b", "a");
+
+        [Fact]
+        public void LooselyExpectShouldFailIfMarbleMatchedAtDifferentMoment() => 
+            LooselyExpectFailure(
+                "a", 
+                null, "a");
+        [Fact]
+        public void LooselyExpectShouldFailIfMarbleNotMatchedInUnorderedGroup() => 
+            LooselyExpectFailure(
+                "-<a b>-", 
+                null, "b", "c", null);
+
+        [Fact]
+        public void LooselyExpectShouldSucceedIfMarblesMatchedInUnorderedGroup() => 
+            LooselyExpectSuccess(
+                "-<a b>-", 
+                null, "b", "c", "a", null);
+
+        [Fact]
+        public void LooselyExpectShouldSucceedIfMarblesMatchedInOrderedGroup() => 
+            LooselyExpectSuccess(
+                "-(a b)-", 
+                null, "a", "c", "b", null);
+
+        [Fact]
+        public void LooselyExpectShouldFailIfMarblesMatchedInOrderedGroupAreInWrongOrder() => 
+            LooselyExpectFailure(
+                "-(a b c d)-", 
+                null, "f", "g", "b", "c", "a", "h", null);
+
+
+        private void LooselyExpectFailure(string sequence, params string[] producedEvents)
+        {
+            LooselyExpect(
+                sequence, 
+                producedEvents);
+            RunMableTest.Should().Throw<Exception>();
+        }
+
+        private void LooselyExpectSuccess(string sequence, params string[] producedEvents)
+        {
+            LooselyExpect(
+                sequence, 
+                producedEvents);
+            RunMableTest.Should().NotThrow<Exception>();
+        }
+
+        private void LooselyExpect(string sequence, params string[] producedEvents) => 
+            _marbleTest.LooselyExpect(
+                sequence,
+                CreateProducer(producedEvents),
+                MarbleShouldEqualActual);
+
         private void AssertDiagnosedFailure(
             string expectMessageToContain,
             string sequence,
