@@ -100,7 +100,6 @@ namespace Divverence.MarbleTesting
             Func<FSharpOption<TEvent>> eventProducer,
             Action<string, TEvent> assertion)
         {
-            var nothingElseMarble = new ExpectedMarble(moment.Time, null, FlushProducerAndAssertIfRequiredActionCreator(eventProducer, moment));
             var momentMarbles = new List<ExpectedMarble>();
             switch (moment.Type)
             {
@@ -120,7 +119,11 @@ namespace Divverence.MarbleTesting
                     throw new ArgumentOutOfRangeException();
             }
 
-            momentMarbles.Add(nothingElseMarble);
+            momentMarbles.Add(
+                new ExpectedMarble(
+                    moment.Time,
+                    null,
+                    FlushProducerAndAssertIfRequiredActionCreator(eventProducer, moment)));
             return momentMarbles;
         }
 
@@ -129,7 +132,6 @@ namespace Divverence.MarbleTesting
             Func<FSharpOption<TEvent>> eventProducer,
             Action<string, TEvent> assertion)
         {
-            var nothingElseMarble = new ExpectedMarble(moment.Time, null, FlushProducerAndAssertIfRequiredActionCreator(eventProducer, moment, true));
             var momentMarbles = new List<ExpectedMarble>();
             switch (moment.Type)
             {
@@ -149,7 +151,11 @@ namespace Divverence.MarbleTesting
                     throw new ArgumentOutOfRangeException();
             }
 
-            momentMarbles.Add(nothingElseMarble);
+            momentMarbles.Add(
+                new ExpectedMarble(
+                    moment.Time,
+                    null,
+                    () => ExhaustProducer(eventProducer)));
             return momentMarbles;
         }
 
@@ -240,11 +246,11 @@ namespace Divverence.MarbleTesting
                     () =>
                     {
                         var produced = ExhaustProducer(eventProducer);
-                            if (produced.Count < moment.Marbles.Length)
-                            {
-                                throw new MissingEventException(
-                                    $"At time {moment.Time}, expecting an ordered group {moment} with {moment.Marbles.Length} elements but got {produced.Count} events: [{string.Join(" ", produced)}]");
-                            }
+                        if (produced.Count < moment.Marbles.Length)
+                        {
+                            throw new MissingEventException(
+                                $"At time {moment.Time}, expecting an ordered group {moment} with {moment.Marbles.Length} elements but got {produced.Count} events: [{string.Join(" ", produced)}]");
+                        }
 
                         var table = FillAssertionResultTable(moment, assertion, produced);
                         if (!(table.AllRowsAtLeastOneSuccess() && table.MonotonicSuccess()))
@@ -302,16 +308,10 @@ namespace Divverence.MarbleTesting
 
         private static Action FlushProducerAndAssertIfRequiredActionCreator<TEvent>(
             Func<FSharpOption<TEvent>> eventProducer,
-            Moment moment,
-            bool superfluousAllowed = false) =>
+            Moment moment) =>
             () =>
                 {
                     var received = ExhaustProducer(eventProducer);
-                    if (superfluousAllowed)
-                    {
-                        return;
-                    }
-
                     if (received.Any())
                     {
                         var receivedList = string.Join(", ", received);
