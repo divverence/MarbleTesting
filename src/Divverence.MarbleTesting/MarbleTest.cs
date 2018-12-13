@@ -27,7 +27,7 @@ namespace Divverence.MarbleTesting
         public async Task Run(TimeSpan? interval = null)
         {
             var maxTime = Expectations.Max(etl => etl.LastTime);
-            var minTime = Expectations.Max(etl => etl.FirstTime);
+            var minTime = Expectations.Min(etl => etl.FirstTime);
             for (var time = minTime; time <= maxTime; time++)
             {
                 var localTime = time;
