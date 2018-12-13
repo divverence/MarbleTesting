@@ -54,6 +54,15 @@ namespace Divverence.MarbleTesting
 
 #pragma warning restore 1998
 
+        public void Assert<TEvent>(
+            string sequence,
+            Action<string> assertion)
+        {
+            AddExpectations(
+                sequence,
+                mom => CreateAssertionExpectations(mom, assertion));
+        }
+
         public void Expect<TEvent>(
             string sequence,
             Func<FSharpOption<TEvent>> eventProducer,
@@ -94,6 +103,9 @@ namespace Divverence.MarbleTesting
                 .SelectMany(marbleFactory);
             Expectations.Add(new ExpectedMarbles(sequence, expectations));
         }
+
+        private IEnumerable<ExpectedMarble> CreateAssertionExpectations(Moment moment, Action<string> assertion) =>
+            moment.Marbles.Select(marble => new ExpectedMarble(moment.Time, marble, () => assertion(marble)));
 
         private static IEnumerable<ExpectedMarble> CreateExpectations<TEvent>(
             Moment moment,
