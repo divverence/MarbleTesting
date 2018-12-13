@@ -137,6 +137,19 @@ namespace Divverence.MarbleTesting.Tests
                 "-(a b c d)-", 
                 null, "f", "g", "b", "c", "a", "h", null);
 
+        [Fact]
+        public void FailingAssertShouldFailRun()
+        {
+            _marbleTest.Assert("a", _ => true.Should().BeFalse());
+            RunMableTest.Should().Throw<Exception>();
+        }
+
+        [Fact]
+        public void PassingAssertShouldPassRun()
+        {
+            _marbleTest.Assert("a", _ => { });
+            RunMableTest.Should().NotThrow<Exception>();
+        }
 
         private void LooselyExpectFailure(string sequence, params string[] producedEvents)
         {

@@ -54,7 +54,7 @@ namespace Divverence.MarbleTesting
 
 #pragma warning restore 1998
 
-        public void Assert<TEvent>(
+        public void Assert(
             string sequence,
             Action<string> assertion)
         {
