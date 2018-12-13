@@ -14,7 +14,7 @@ namespace Divverence.MarbleTesting.Akka
         /// </summary>
         /// <param name="sys">Your TestKit.Sys ActorSystem</param>
         public AkkaMarbleTest(ActorSystem sys)
-            : this(sys, MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward, MultiCharMarbleParser.ParseSequence)
+            : this(MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward, MultiCharMarbleParser.ParseSequence)
         {
         }
 
@@ -23,7 +23,7 @@ namespace Divverence.MarbleTesting.Akka
         /// </summary>
         /// <param name="sys">Your TestKit.Sys ActorSystem</param>
         /// <param name="marbleParserFunc">Your Marble Sequence parser function</param>
-        public AkkaMarbleTest(ActorSystem sys, Func<string, IEnumerable<Moment>> marbleParserFunc) : this(sys, MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward, marbleParserFunc)
+        public AkkaMarbleTest(ActorSystem sys, Func<string, IEnumerable<Moment>> marbleParserFunc) : this(MultiDispatcherAwaiter.CreateFromActorSystem(sys).Idle, sys.FastForward, marbleParserFunc)
         {
         }
 
@@ -32,7 +32,7 @@ namespace Divverence.MarbleTesting.Akka
         /// </summary>
         /// <param name="waitForIdle">Function that provides a Task that Run(..?) will await after issuing all actions, before verifying expectations</param>
         /// <param name="fastForward">Function that provides a Task that Run(step) will await after verifying expectations</param>
-        public AkkaMarbleTest(ActorSystem sys, Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward) : this(sys, waitForIdle, fastForward, MultiCharMarbleParser.ParseSequence)
+        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward) : this(waitForIdle, fastForward, MultiCharMarbleParser.ParseSequence)
         {
         }
 
@@ -43,16 +43,11 @@ namespace Divverence.MarbleTesting.Akka
         /// <param name="waitForIdle">Function that provides a Task that Run(..?) will await after issuing all actions, before verifying expectations</param>
         /// <param name="fastForward">Function that provides a Task that Run(step) will await after verifying expectations</param>
         /// <param name="marbleParserFunc">Your Marble Sequence parser function</param>
-        public AkkaMarbleTest(
-            ActorSystem sys,
-            Func<Task> waitForIdle, 
-            Func<TimeSpan, Task> fastForward,
+        public AkkaMarbleTest(Func<Task> waitForIdle, Func<TimeSpan, Task> fastForward,
             Func<string, IEnumerable<Moment>> marbleParserFunc) : base(waitForIdle, fastForward, marbleParserFunc)
         {
-            ActorSystem = sys;
         }
 
-        public ActorSystem ActorSystem { get; }
         /// <summary>
         /// Returns the piece of Akka.Net configuration that makes sure the Awaitable Dispatcher is used for both test probes and all actors.
         /// It also makes sure the Akka Testkit TestScheduler is active
