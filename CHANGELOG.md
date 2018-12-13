@@ -16,6 +16,24 @@ Change log entries should be formulated in the imperative present tense.
 ### Changed
 
 * Change the `TestProbe` parameter in `AkkaUnorderedExpectations.CreateExpectedMarbleForUnorderedGroup` to be of type `Action<Action<T>>`.
+* Change the type of the `assertionFactory` parameter from `Func<string, Action<T>>` to `Action<string, T>` in `MarbleTestExtensionsForAkka.ExpectMsgs` overloads.
+* The following types are now `internal`:
+    * `ExpectedMarble`
+    * `ExpectedMarbles`
+    * `InputMarble`
+* The accessibility of the lists `Expectations` and `Inputs` on `MarbleTest` is now `private`.
+* The accessibility of the methods `CreateInputMarbles` and `ParseSequence` is now `private`.
+* Change different constructors of `Moment` to static factory methods.
+* Change the `bool` `IsOrderedGroup` property to a `MomentType` `enum` property `Type`.
+
+### Added
+
+* Add methods `Assert` and `LooselyExpect` to `MarbleTest`
+* Add `TimeShiftedClone` method to `Moment`.
+
+### Deleted
+
+* Remove `[Obsolete(...)]` `ExpectMsgs` overloads that use predicates.
 
 ## [0.7.0] - 2018-11-22
 

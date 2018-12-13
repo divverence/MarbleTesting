@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Divverence.MarbleTesting
 {
-    public class ExpectedMarbles
+    internal class ExpectedMarbles
     {
-        public ExpectedMarbles(string sequence, IEnumerable<ExpectedMarble> expectations)
+        internal ExpectedMarbles(string sequence, IEnumerable<ExpectedMarble> expectations)
         {
             Sequence = sequence;
             Expectations = expectations.ToImmutableList();

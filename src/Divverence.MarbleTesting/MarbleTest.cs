@@ -11,8 +11,8 @@ namespace Divverence.MarbleTesting
         private static Func<string, IEnumerable<Moment>> _parseSequenceFunc;
         private readonly Func<TimeSpan, Task> _fastForward;
         private readonly Func<Task> _waitForIdle;
-        protected List<ExpectedMarbles> Expectations = new List<ExpectedMarbles>();
-        protected List<InputMarbles> Inputs = new List<InputMarbles>();
+        private readonly List<ExpectedMarbles> _expectations = new List<ExpectedMarbles>();
+        private readonly List<InputMarbles> _inputs = new List<InputMarbles>();
 
         public MarbleTest(
             Func<Task> waitForIdle,
@@ -26,15 +26,15 @@ namespace Divverence.MarbleTesting
 
         public async Task Run(TimeSpan? interval = null)
         {
-            var maxTime = Expectations.Max(etl => etl.LastTime);
-            var minTime = Expectations.Min(etl => etl.FirstTime);
+            var maxTime = _expectations.Max(etl => etl.LastTime);
+            var minTime = _expectations.Min(etl => etl.FirstTime);
             for (var time = minTime; time <= maxTime; time++)
             {
                 var localTime = time;
-                await Task.WhenAll(Inputs.Select(atl => atl.Run(localTime)));
+                await Task.WhenAll(_inputs.Select(atl => atl.Run(localTime)));
                 await SystemIdle;
-                Expectations.ForEach(etl => etl.Verify(time));
-                Expectations.ForEach(etl => etl.VerifyNothingElse(time));
+                _expectations.ForEach(etl => etl.Verify(time));
+                _expectations.ForEach(etl => etl.VerifyNothingElse(time));
                 if (interval.HasValue)
                     await FastForward(interval.Value);
             }
@@ -43,7 +43,7 @@ namespace Divverence.MarbleTesting
         public void WhenDoing(string sequence, Func<string, Task> whatToDo)
         {
             var actions = ParseSequence(sequence).SelectMany(moment => CreateInputMarbles(moment, whatToDo));
-            Inputs.Add(new InputMarbles(sequence, actions));
+            _inputs.Add(new InputMarbles(sequence, actions));
         }
 
 #pragma warning disable 1998 // Seems the best way to convert Action<string> into a Func<string,Task> ...
@@ -83,10 +83,10 @@ namespace Divverence.MarbleTesting
                 mom => CreateLooseExpectations(mom, eventProducer, assertion));
         }
 
-        protected IEnumerable<InputMarble> CreateInputMarbles(Moment moment, Func<string, Task> whatToDo) =>
+        private static IEnumerable<InputMarble> CreateInputMarbles(Moment moment, Func<string, Task> whatToDo) =>
             moment.Marbles.Select(marble => new InputMarble(moment.Time, marble, () => whatToDo(marble)));
 
-        protected static IEnumerable<Moment> ParseSequence(string sequence) =>
+        private static IEnumerable<Moment> ParseSequence(string sequence) =>
             _parseSequenceFunc(sequence);
 
         private Task FastForward(TimeSpan howMuch) =>
@@ -101,7 +101,7 @@ namespace Divverence.MarbleTesting
         {
             var expectations = ParseSequence(sequence)
                 .SelectMany(marbleFactory);
-            Expectations.Add(new ExpectedMarbles(sequence, expectations));
+            _expectations.Add(new ExpectedMarbles(sequence, expectations));
         }
 
         private static IEnumerable<ExpectedMarble> CreateAssertionExpectations(
