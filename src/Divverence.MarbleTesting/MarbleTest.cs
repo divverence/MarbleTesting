@@ -104,8 +104,10 @@ namespace Divverence.MarbleTesting
             Expectations.Add(new ExpectedMarbles(sequence, expectations));
         }
 
-        private IEnumerable<ExpectedMarble> CreateAssertionExpectations(Moment moment, Action<string> assertion) =>
-            moment.Marbles.Select(marble => new ExpectedMarble(moment.Time, marble, () => assertion(marble)));
+        private static IEnumerable<ExpectedMarble> CreateAssertionExpectations(
+            Moment moment, 
+            Action<string> assertion) =>
+                moment.Marbles.Select(marble => new ExpectedMarble(moment.Time, marble, () => assertion(marble)));
 
         private static IEnumerable<ExpectedMarble> CreateExpectations<TEvent>(
             Moment moment,
