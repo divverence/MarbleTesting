@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Divverence.MarbleTesting
 {
-    public class InputMarbles
+    internal class InputMarbles
     {
         public InputMarbles(string sequence, IEnumerable<InputMarble> actions)
         {
@@ -31,7 +31,7 @@ namespace Divverence.MarbleTesting
             catch (Exception e)
             {
                 throw new Exception(
-                    $"Error when firing marble '{m.Marble}' at time {time} on sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}", e);
+                    $"At time {time}, there was an error when firing marble '{m.Marble}' {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}", e);
             }
         }
     }

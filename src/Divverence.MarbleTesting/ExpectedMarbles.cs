@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Divverence.MarbleTesting
 {
-    public class ExpectedMarbles
+    internal class ExpectedMarbles
     {
-        public ExpectedMarbles(string sequence, IEnumerable<ExpectedMarble> expectations)
+        internal ExpectedMarbles(string sequence, IEnumerable<ExpectedMarble> expectations)
         {
             Sequence = sequence;
             Expectations = expectations.ToImmutableList();
@@ -20,11 +20,17 @@ namespace Divverence.MarbleTesting
         public int LastTime { get; set; }
         public int FirstTime { get; set; }
 
-        public bool Verify(int time)
+        public void Verify(int time)
         {
             var expectations = Expectations.Where(e => e.Time == time).Where(e => e.Marble != null).ToList();
+            InvokeAssertions(time, expectations);
+        }
+
+        public void VerifyNothingElse(int time)
+        {
+            var expectations = Expectations.Where(e => e.Time == time).Where(e => e.Marble == null).ToList();
             if (!expectations.Any())
-                return false;
+                return;
 
             foreach (var exp in expectations)
                 try
@@ -34,29 +40,39 @@ namespace Divverence.MarbleTesting
                 catch (Exception e)
                 {
                     throw new Exception(
-                        $"Expected marble '{exp.Marble}' at time {time} but got a different marble in sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}", e);
+                        $"At time {time}, unexpected events were received {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}.", e);
                 }
-            return true;
         }
 
-        public bool VerifyNothingElse(int time)
+        private void InvokeAssertions(int time, List<ExpectedMarble> expectations)
         {
-            var expectations = Expectations.Where(e => e.Time == time).Where(e => e.Marble == null).ToList();
             if (!expectations.Any())
-                return false;
+                return;
 
             foreach (var exp in expectations)
                 try
                 {
                     exp.Assertion();
                 }
+                catch (MissingEventException mee)
+                {
+                    throw new Exception(
+                        $"At time {time}, for marble '{exp.Marble}' not all expected events were received {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{mee.Message}.",
+                        mee);
+                }
+                catch (UnexpectedEventsException uee)
+                {
+                    throw new Exception(
+                        $"At time {time}, for marble '{exp.Marble}' unexpected events were received {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{uee.Message}.",
+                        uee);
+                }
+
                 catch (Exception e)
                 {
-                    if (exp.Marble == null)
-                        throw new Exception(
-                            $"Unexpected event received at time {time} in sequence {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}", e);
+                    throw new Exception(
+                        $"At time {time}, for marble '{exp.Marble}' its assertion was not satisfied {ErrorMessageHelper.SequenceWithPointerToOffendingMoment(Sequence, time)}{Environment.NewLine}{e.Message}.",
+                        e);
                 }
-            return true;
         }
     }
 }

@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Divverence.MarbleTesting
 {
-    public class InputMarble
+    internal class InputMarble
     {
-        public InputMarble(int time, string marble, Func<Task> action)
+        internal InputMarble(int time, string marble, Func<Task> action)
         {
             Time = time;
             Marble = marble;

@@ -33,9 +33,14 @@
     <ConfigurationFiles Include="etc\**\*.ini" />
     <ConfigurationFiles Include="etc\**\*.json" />
     <ConfigurationFiles Include="etc\**\*.config" />
+    <ConfigurationFiles Include="etc\**\*.hocon" />
   </ItemGroup>
+
   <Target Name="MyAfterBuild" AfterTargets="Build">
     <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles-&gt;'$(ProjectDir)bin\$(Configuration)\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
   </Target>
 
+  <Target Name="MyAfterPublish" AfterTargets="Publish">
+    <Copy SourceFiles="@(ConfigurationFiles)" DestinationFiles="@(ConfigurationFiles-&gt;'$(PublishDir)..\etc\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 </Project>
