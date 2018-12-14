@@ -29,7 +29,7 @@ Change log entries should be formulated in the imperative present tense.
 
 ### Added
 
-* Add methods `Assert` and `LooselyExpect` to `MarbleTest`
+* Add methods `Assert` and `ExpectAtLeast` to `MarbleTest`
 * Add `TimeShiftedClone` method to `Moment`.
 
 ### Deleted

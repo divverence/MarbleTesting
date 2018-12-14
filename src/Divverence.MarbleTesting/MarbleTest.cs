@@ -70,7 +70,7 @@ namespace Divverence.MarbleTesting
                 mom => CreateExpectations(mom, eventProducer, assertion));
         }
 
-        public void LooselyExpect<TEvent>(
+        public void ExpectAtLeast<TEvent>(
             string sequence,
             Func<FSharpOption<TEvent>> eventProducer,
             Action<string, TEvent> assertion)
@@ -102,7 +102,7 @@ namespace Divverence.MarbleTesting
         }
 
         private static IEnumerable<ExpectedMarble> CreateAssertionExpectations(
-            Moment moment, 
+            Moment moment,
             Action<string> assertion) =>
                 moment.Marbles.Select(marble => new ExpectedMarble(moment.Time, marble, () => assertion(marble)));
 

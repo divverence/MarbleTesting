@@ -91,50 +91,50 @@ namespace Divverence.MarbleTesting.Tests
                 null, "a", "b", "c", null);
 
         [Fact]
-        public void LooselyExpectShouldIgnoreUnexpectedEvents() => 
-            LooselyExpectSuccess(
-                "-", 
+        public void ExpectAtLeastShouldIgnoreUnexpectedEvents() =>
+            ExpectAtLeastSuccess(
+                "-",
                 "b");
 
         [Fact]
-        public void LooselyExpectShouldFailIfMarbleNotMatched() => 
-            LooselyExpectFailure(
-                "a", 
+        public void ExpectAtLeastShouldFailIfMarbleNotMatched() =>
+            ExpectAtLeastFailure(
+                "a",
                 "b");
 
         [Fact]
-        public void LooselyExpectShouldSucceedIfMarbleSatisfiedLater() => 
-            LooselyExpectSuccess(
-                "a", 
+        public void ExpectAtLeastShouldSucceedIfMarbleSatisfiedLater() =>
+            ExpectAtLeastSuccess(
+                "a",
                 "b", "a");
 
         [Fact]
-        public void LooselyExpectShouldFailIfMarbleMatchedAtDifferentMoment() => 
-            LooselyExpectFailure(
-                "a", 
+        public void ExpectAtLeastShouldFailIfMarbleMatchedAtDifferentMoment() =>
+            ExpectAtLeastFailure(
+                "a",
                 null, "a");
         [Fact]
-        public void LooselyExpectShouldFailIfMarbleNotMatchedInUnorderedGroup() => 
-            LooselyExpectFailure(
-                "-<a b>-", 
+        public void ExpectAtLeastShouldFailIfMarbleNotMatchedInUnorderedGroup() =>
+            ExpectAtLeastFailure(
+                "-<a b>-",
                 null, "b", "c", null);
 
         [Fact]
-        public void LooselyExpectShouldSucceedIfMarblesMatchedInUnorderedGroup() => 
-            LooselyExpectSuccess(
-                "-<a b>-", 
+        public void ExpectAtLeastShouldSucceedIfMarblesMatchedInUnorderedGroup() =>
+            ExpectAtLeastSuccess(
+                "-<a b>-",
                 null, "b", "c", "a", null);
 
         [Fact]
-        public void LooselyExpectShouldSucceedIfMarblesMatchedInOrderedGroup() => 
-            LooselyExpectSuccess(
-                "-(a b)-", 
+        public void ExpectAtLeastShouldSucceedIfMarblesMatchedInOrderedGroup() =>
+            ExpectAtLeastSuccess(
+                "-(a b)-",
                 null, "a", "c", "b", null);
 
         [Fact]
-        public void LooselyExpectShouldFailIfMarblesMatchedInOrderedGroupAreInWrongOrder() => 
-            LooselyExpectFailure(
-                "-(a b c d)-", 
+        public void ExpectAtLeastShouldFailIfMarblesMatchedInOrderedGroupAreInWrongOrder() =>
+            ExpectAtLeastFailure(
+                "-(a b c d)-",
                 null, "f", "g", "b", "c", "a", "h", null);
 
         [Fact]
@@ -151,24 +151,24 @@ namespace Divverence.MarbleTesting.Tests
             RunMableTest.Should().NotThrow<Exception>();
         }
 
-        private void LooselyExpectFailure(string sequence, params string[] producedEvents)
+        private void ExpectAtLeastFailure(string sequence, params string[] producedEvents)
         {
-            LooselyExpect(
-                sequence, 
+            ExpectAtLeast(
+                sequence,
                 producedEvents);
             RunMableTest.Should().Throw<Exception>();
         }
 
-        private void LooselyExpectSuccess(string sequence, params string[] producedEvents)
+        private void ExpectAtLeastSuccess(string sequence, params string[] producedEvents)
         {
-            LooselyExpect(
-                sequence, 
+            ExpectAtLeast(
+                sequence,
                 producedEvents);
             RunMableTest.Should().NotThrow<Exception>();
         }
 
-        private void LooselyExpect(string sequence, params string[] producedEvents) => 
-            _marbleTest.LooselyExpect(
+        private void ExpectAtLeast(string sequence, params string[] producedEvents) =>
+            _marbleTest.ExpectAtLeast(
                 sequence,
                 CreateProducer(producedEvents),
                 MarbleShouldEqualActual);
@@ -202,7 +202,6 @@ namespace Divverence.MarbleTesting.Tests
                 {
                     return FSharpOption<string>.None;
                 }
-
                 return FSharpOption<string>.Some(s);
             };
         }
