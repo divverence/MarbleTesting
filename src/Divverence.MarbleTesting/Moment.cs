@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Divverence.MarbleTesting
 {
-    public class Moment
+    internal class Moment
     {
         public enum MomentType
         {

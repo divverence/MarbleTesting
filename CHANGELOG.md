@@ -21,6 +21,7 @@ Change log entries should be formulated in the imperative present tense.
     * `ExpectedMarble`
     * `ExpectedMarbles`
     * `InputMarble`
+    * `Moment`
 * The accessibility of the lists `Expectations` and `Inputs` on `MarbleTest` is now `private`.
 * The accessibility of the methods `CreateInputMarbles` and `ParseSequence` is now `private`.
 * Change different constructors of `Moment` to static factory methods.
@@ -34,6 +35,9 @@ Change log entries should be formulated in the imperative present tense.
 ### Deleted
 
 * Remove `[Obsolete(...)]` `ExpectMsgs` overloads that use predicates.
+* Remove `MarbleParser`, the `MultiCharMarbleParser` is the only parser that can be used.
+* Remove `MarbleTest` constructors that allow specifying the marble parser to use.
+
 
 ## [0.7.0] - 2018-11-22
 

@@ -144,7 +144,7 @@ namespace Divverence.MarbleTesting.Tests
         [Theory]
         [InlineData("a-(c1^d1)-f", Moment.MomentType.OrderedGroup)]
         [InlineData("a-<c1^d1>-f", Moment.MomentType.UnorderedGroup)]
-        public void Should_take_moment_of_group_start_as_0_time(string inputSequence, Moment.MomentType expectedMomentType)
+        internal void Should_take_moment_of_group_start_as_0_time(string inputSequence, Moment.MomentType expectedMomentType)
         {
             var actual = MultiCharMarbleParser.ParseSequence(inputSequence);
             actual.First().Time.Should().Be(-2);

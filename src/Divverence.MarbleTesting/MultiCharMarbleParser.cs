@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Divverence.MarbleTesting
 {
-    public static class MultiCharMarbleParser
+    internal static class MultiCharMarbleParser
     {
         private enum ParsingState
         {

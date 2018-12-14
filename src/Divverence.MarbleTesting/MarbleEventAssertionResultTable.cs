@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -26,7 +25,12 @@ namespace Divverence.MarbleTesting
             public string AssertionExceptionMessage { get; }
         }
 
-        public List<List<Result>> Results { get; } = new List<List<Result>>();
+        private readonly IList<List<Result>> _results = new List<List<Result>>();
+
+        public void AddResultsRow(IEnumerable<Result> resultRow)
+        {
+            _results.Add(resultRow.ToList());
+        }
 
         public override string ToString()
         {
@@ -39,14 +43,14 @@ namespace Divverence.MarbleTesting
             return result.ToString();
         }
 
-        public bool AllRowsAtLeastOneSuccess() => Results.All(row => row.Count(c => c.Succeeded) >= 1);
+        public bool AllRowsAtLeastOneSuccess() => _results.All(row => row.Count(c => c.Succeeded) >= 1);
 
-        public bool AllColumnsAtLeastOneSuccess() => Enumerable.Range(0, Results[0].Count).All(i => Results.Any(r => r[i].Succeeded));
+        public bool AllColumnsAtLeastOneSuccess() => Enumerable.Range(0, _results[0].Count).All(i => _results.Any(r => r[i].Succeeded));
 
         public bool MonotonicSuccess()
         {
             var maxSuccessIndex = -1;
-            foreach (var t in Results)
+            foreach (var t in _results)
             {
                 var successIndex = t.FindIndex(r => r.Succeeded);
                 if (successIndex <= maxSuccessIndex)
@@ -60,15 +64,14 @@ namespace Divverence.MarbleTesting
 
         private IEnumerable<(string FailureId, string FailureMessage)> AppendFailureTable(StringBuilder result)
         {
-            var marbleColumnLength = Results.Max(row => row[0].Marble.Length);
+            var marbleColumnLength = _results.Max(row => row[0].Marble.Length);
             var toDumpFailures = new List<(string FailureId, string FailureMessage)>();
             var errorIndex = 'a';
             result.AppendLine("Summary:");
             result.Append(new string(' ', marbleColumnLength + 1));
-            result.AppendLine(String.Join("   ", Results[0].Select((row, index) => $"e{index}")));
-            for (var rowIndex = 0; rowIndex < Results.Count; rowIndex++)
+            result.AppendLine(string.Join("   ", _results[0].Select((row, index) => $"e{index}")));
+            foreach (var row in _results)
             {
-                var row = Results[rowIndex];
                 result.AppendFormat($"{{0,{marbleColumnLength}}} ", row[0].Marble);
                 var wasMarbleSatisfied = row.Any(c => c.Succeeded);
                 for (var i = 0; i < row.Count; i++)
@@ -94,7 +97,7 @@ namespace Divverence.MarbleTesting
         private void AppendEventLegend(StringBuilder result)
         {
             result.AppendLine("Events:");
-            var firstRow = Results[0];
+            var firstRow = _results[0];
             for (var i = 0; i < firstRow.Count; i++)
             {
                 result.AppendLine($"e{i} : {firstRow[i].Event}");
@@ -104,9 +107,9 @@ namespace Divverence.MarbleTesting
         private char AppendCell(
             int columnIndex,
             bool wasMarbleSatisfied,
-            List<Result> row,
+            IReadOnlyList<Result> row,
             char errorIndex,
-            List<(string FailureId, string FailureMessage)> toDumpFailures,
+            ICollection<(string FailureId, string FailureMessage)> toDumpFailures,
             StringBuilder result)
         {
             var eventWasExpected = EventExpected(columnIndex);
@@ -122,6 +125,6 @@ namespace Divverence.MarbleTesting
             return errorIndex;
         }
 
-        private bool EventExpected(int eventIndex) => Results.Any(r => r[eventIndex].Succeeded);
+        private bool EventExpected(int eventIndex) => _results.Any(r => r[eventIndex].Succeeded);
     }
 }

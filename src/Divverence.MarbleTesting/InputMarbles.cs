@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Divverence.MarbleTesting
 {
-    public class InputMarbles
+    internal class InputMarbles
     {
         public InputMarbles(string sequence, IEnumerable<InputMarble> actions)
         {

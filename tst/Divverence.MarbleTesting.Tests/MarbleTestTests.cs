@@ -12,7 +12,7 @@ namespace Divverence.MarbleTesting.Tests
 
         public MarbleTestTests()
         {
-            _marbleTest = new MarbleTest(() => Task.FromResult(true), _ => Task.FromResult(true), MultiCharMarbleParser.ParseSequence);
+            _marbleTest = new MarbleTest(() => Task.FromResult(true), _ => Task.FromResult(true));
         }
 
         private Func<Task> RunMableTest

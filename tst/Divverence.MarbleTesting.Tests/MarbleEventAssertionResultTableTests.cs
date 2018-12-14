@@ -21,7 +21,7 @@ namespace Divverence.MarbleTesting.Tests
         public void AllRowsAtLeastOneSuccessShouldFailIfARowDoesNotContainASuccess()
         {
             var sut = new MarbleEventAssertionResultTable();
-            sut.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            sut.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 AFailure
             });
@@ -31,11 +31,11 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public void AllRowsAtLeastOneSuccessShouldBeTrueIfAllRowsContainASuccess()
         {
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 ASuccess
             });
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 AFailure,
                 ASuccess
@@ -46,11 +46,11 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public void MonotonicSuccessShouldReturnTrueForMonotonicSuccess()
         {
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 ASuccess
             });
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 AFailure,
                 ASuccess
@@ -61,12 +61,12 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public void MonotonicSuccessShouldReturnFalseForNonMonotonicSuccess()
         {
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 AFailure,
                 ASuccess
             });
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 ASuccess,
                 AFailure
@@ -77,12 +77,12 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public void MonotonicSuccessShouldReturnFalseForNonStrictlyMonotonicSuccess()
         {
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 AFailure,
                 ASuccess
             });
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 AFailure,
                 ASuccess
@@ -99,7 +99,7 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public void MonotonicSuccessShouldReturnTrueForSingleSuccessTable()
         {
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 ASuccess
             });
@@ -109,11 +109,11 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public void AllColumnsAtLeastOneSuccessShouldReturnFalseForAllFailuresTable()
         {
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 AFailure,
             });
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 AFailure,
             });
@@ -123,12 +123,12 @@ namespace Divverence.MarbleTesting.Tests
         [Fact]
         public void AllColumnsAtLeastOneSuccessShouldReturnTrueForTable()
         {
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 ASuccess,
                 AFailure,
             });
-            _table.Results.Add(new List<MarbleEventAssertionResultTable.Result>
+            _table.AddResultsRow(new List<MarbleEventAssertionResultTable.Result>
             {
                 AFailure,
                 ASuccess

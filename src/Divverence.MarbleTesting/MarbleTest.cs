@@ -8,7 +8,6 @@ namespace Divverence.MarbleTesting
 {
     public class MarbleTest
     {
-        private static Func<string, IEnumerable<Moment>> _parseSequenceFunc;
         private readonly Func<TimeSpan, Task> _fastForward;
         private readonly Func<Task> _waitForIdle;
         private readonly List<ExpectedMarbles> _expectations = new List<ExpectedMarbles>();
@@ -16,12 +15,10 @@ namespace Divverence.MarbleTesting
 
         public MarbleTest(
             Func<Task> waitForIdle,
-            Func<TimeSpan, Task> fastForward,
-            Func<string, IEnumerable<Moment>> parserFunc = null)
+            Func<TimeSpan, Task> fastForward)
         {
             _waitForIdle = waitForIdle;
             _fastForward = fastForward;
-            _parseSequenceFunc = parserFunc ?? MarbleParser.ParseSequence;
         }
 
         public async Task Run(TimeSpan? interval = null)
@@ -87,7 +84,7 @@ namespace Divverence.MarbleTesting
             moment.Marbles.Select(marble => new InputMarble(moment.Time, marble, () => whatToDo(marble)));
 
         private static IEnumerable<Moment> ParseSequence(string sequence) =>
-            _parseSequenceFunc(sequence);
+            MultiCharMarbleParser.ParseSequence(sequence);
 
         private Task FastForward(TimeSpan howMuch) =>
             _fastForward(howMuch);
@@ -213,7 +210,7 @@ namespace Divverence.MarbleTesting
                     row.Add(new MarbleEventAssertionResultTable.Result(m, @event,
                         succeeded ? string.Empty : exception.Message));
                 }
-                table.Results.Add(row);
+                table.AddResultsRow(row);
             }
             return table;
         }
