@@ -13,6 +13,9 @@ Change log entries should be formulated in the imperative present tense.
 
 ## Unreleased
 
+
+## [1.0.0] - 2018-12-14
+
 ### Changed
 
 * Change the `TestProbe` parameter in `AkkaUnorderedExpectations.CreateExpectedMarbleForUnorderedGroup` to be of type `Action<Action<T>>`.
