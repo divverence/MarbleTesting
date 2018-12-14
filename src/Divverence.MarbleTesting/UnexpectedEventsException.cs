@@ -3,7 +3,7 @@
 namespace Divverence.MarbleTesting
 {
     /// <summary>
-    /// This exception should be used to signal the fact that unexpected events where received on a given moment.
+    /// This exception should be used to signal the fact that unexpected events were received on a given moment.
     /// </summary>
     internal sealed class UnexpectedEventsException : Exception
     {

@@ -79,7 +79,6 @@ namespace Divverence.MarbleTesting
                             GrowMarble(marbleBuilder, ref marbleTime, time, character);
                             break;
                     }
-
                 }
                 else if (parsingState == ParsingState.InOrderedGroup)
                 {
@@ -115,7 +114,6 @@ namespace Divverence.MarbleTesting
                             GrowMarble(marbleBuilder, ref marbleTime, groupTime, character);
                             break;
                     }
-
                 }
                 else if (parsingState == ParsingState.InUnorderedGroup)
                 {
