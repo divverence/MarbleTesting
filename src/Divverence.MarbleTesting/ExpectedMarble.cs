@@ -2,9 +2,9 @@ using System;
 
 namespace Divverence.MarbleTesting
 {
-    public class ExpectedMarble
+    internal class ExpectedMarble
     {
-        public ExpectedMarble(int time, string marble, Action assertion)
+        internal ExpectedMarble(int time, string marble, Action assertion)
         {
             Time = time;
             Marble = marble;

@@ -41,24 +41,11 @@ namespace Divverence.MarbleTesting.Akka.Tests
 
         [Theory]
         [MemberData(nameof(UnorderedGroupTestInput))]
-        public async Task Should_handle_unordered_group_as_unordered(params (string Key, string[] ToSend)[] inputMappings)
-        {
-            var marbleTest = SetupMarbleTest(
-                "ab---------j",
-                "a<bcdefghi>j",
-                false,
-                inputMappings);
-            await marbleTest.Run();
-        }
-
-        [Theory]
-        [MemberData(nameof(UnorderedGroupTestInput))]
         public async Task Should_handle_unordered_group_as_unordered_for_multi_char_parser(params (string Key, string[] ToSend)[] inputMappings)
         {
             var marbleTest = SetupMarbleTest(
                 "a-b-----------------j",
                 "a-<b c d e f g h i>-j",
-                true,
                 inputMappings);
             await marbleTest.Run();
         }
@@ -78,25 +65,23 @@ namespace Divverence.MarbleTesting.Akka.Tests
         public async Task Should_report_error(params (string Key, string[] ToSend)[] inputMappings)
         {
             var marbleTest = SetupMarbleTest(
-                "ab---d",
-                "a<bc>d",
-                false,
+                "a-b-----d",
+                "a-<b c>-d",
                 inputMappings);
             var actual = await Assert.ThrowsAsync<Exception>(() => marbleTest.Run());
             Assert.NotNull(actual.InnerException);
         }
 
-        private AkkaMarbleTest SetupMarbleTest(string inputSequence, string expectedOutputSequence, bool useMultiCharParser, params (string Key, string[] ToSend)[] inputMappings)
+        private AkkaMarbleTest SetupMarbleTest(string inputSequence, string expectedOutputSequence, params (string Key, string[] ToSend)[] inputMappings)
         {
             var inputMapping = inputMappings.ToDictionary(valueTuple => valueTuple.Key, valueTuple => valueTuple.ToSend);
             var testProbe = CreateTestProbe(Sys, "OutputProbe");
             var mapperActor = Sys.ActorOf(MapperActor.Props(inputMapping, testProbe), "Mapper");
-            IEnumerable<Moment> ParserFunc(string s) => useMultiCharParser ? MultiCharMarbleParser.ParseSequence(s) : MarbleParser.ParseSequence(s);
-            var marbleTest = new AkkaMarbleTest(Sys, ParserFunc);
+            var marbleTest = new AkkaMarbleTest(Sys);
             marbleTest.WhenTelling(
                 inputSequence, mapperActor, s => s);
             marbleTest.ExpectMsgs<string>(
-                expectedOutputSequence, testProbe, s => o => o.Should().Be(s));
+                expectedOutputSequence, testProbe, (s, o) => o.Should().Be(s));
             return marbleTest;
         }
 
@@ -106,9 +91,9 @@ namespace Divverence.MarbleTesting.Akka.Tests
             var marbleTest = new AkkaMarbleTest(Sys);
             var testProbe = CreateTestProbe(Sys, "OutputProbe");
             marbleTest.WhenTelling("         a-b-c-d-e-f", testProbe, _ => _);
-            marbleTest.ExpectMsgs<string>("  a-----d----", testProbe, (marble, data) => marble == data);
-            marbleTest.ExpectMsgs<string>("  --b-----e--", testProbe, (marble, data) => marble == data);
-            marbleTest.ExpectMsgs<string>("  ----c-----f", testProbe, (marble, data) => marble == data);
+            marbleTest.ExpectMsgs<string>("  a-----d----", testProbe, (marble, data) => data.Should().Be(marble));
+            marbleTest.ExpectMsgs<string>("  --b-----e--", testProbe, (marble, data) => data.Should().Be(marble));
+            marbleTest.ExpectMsgs<string>("  ----c-----f", testProbe, (marble, data) => data.Should().Be(marble));
             await marbleTest.Run();
         }
 
@@ -118,9 +103,9 @@ namespace Divverence.MarbleTesting.Akka.Tests
             var marbleTest = new AkkaMarbleTest(Sys);
             var testProbe = CreateTestProbe(Sys, "OutputProbe");
             marbleTest.WhenTelling("         a-b-c-d-e-f", testProbe, _ => _);
-            marbleTest.ExpectMsgs<string>("  ----c-----f", testProbe, (marble, data) => marble == data);
-            marbleTest.ExpectMsgs<string>("  a-----d----", testProbe, (marble, data) => marble == data);
-            marbleTest.ExpectMsgs<string>("  --b-----e--", testProbe, (marble, data) => marble == data);
+            marbleTest.ExpectMsgs<string>("  ----c-----f", testProbe, (marble, data) => data.Should().Be(marble));
+            marbleTest.ExpectMsgs<string>("  a-----d----", testProbe, (marble, data) => data.Should().Be(marble));
+            marbleTest.ExpectMsgs<string>("  --b-----e--", testProbe, (marble, data) => data.Should().Be(marble));
             await marbleTest.Run();
         }
 
@@ -130,9 +115,9 @@ namespace Divverence.MarbleTesting.Akka.Tests
             var marbleTest = new AkkaMarbleTest(Sys);
             var testProbe = CreateTestProbe(Sys, "OutputProbe");
             marbleTest.WhenTelling("         a-b-c-d-e-f-g-", testProbe, _ => _);
-            marbleTest.ExpectMsgs<string>("  a-----d-------", testProbe, (marble, data) => marble == data);
-            marbleTest.ExpectMsgs<string>("  --b-----e-----", testProbe, (marble, data) => marble == data);
-            marbleTest.ExpectMsgs<string>("  ----c-----f---", testProbe, (marble, data) => marble == data);
+            marbleTest.ExpectMsgs<string>("  a-----d-------", testProbe, (marble, data) => data.Should().Be(marble));
+            marbleTest.ExpectMsgs<string>("  --b-----e-----", testProbe, (marble, data) => data.Should().Be(marble));
+            marbleTest.ExpectMsgs<string>("  ----c-----f---", testProbe, (marble, data) => data.Should().Be(marble));
             var exception = await Assert.ThrowsAsync<Exception>(() => marbleTest.Run());
             Assert.Contains("a-----d", exception.Message);
         }
@@ -143,9 +128,9 @@ namespace Divverence.MarbleTesting.Akka.Tests
             var marbleTest = new AkkaMarbleTest(Sys);
             var testProbe = CreateTestProbe(Sys, "OutputProbe");
             marbleTest.WhenTelling("         a-b-c-d-e-f-g-", testProbe, _ => _);
-            marbleTest.ExpectMsgs<string>("  a-----d       ", testProbe, (marble, data) => marble == data);
-            marbleTest.ExpectMsgs<string>("  --b-----e     ", testProbe, (marble, data) => marble == data);
-            marbleTest.ExpectMsgs<string>("  ----c-----f---", testProbe, (marble, data) => marble == data);
+            marbleTest.ExpectMsgs<string>("  a-----d       ", testProbe, (marble, data) => data.Should().Be(marble));
+            marbleTest.ExpectMsgs<string>("  --b-----e     ", testProbe, (marble, data) => data.Should().Be(marble));
+            marbleTest.ExpectMsgs<string>("  ----c-----f---", testProbe, (marble, data) => data.Should().Be(marble));
             var exception = await Assert.ThrowsAsync<Exception>(() => marbleTest.Run());
             Assert.Contains("-c-----f", exception.Message);
         }

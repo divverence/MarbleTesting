@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Divverence.MarbleTesting
 {
-    public static class MultiCharMarbleParser
+    internal static class MultiCharMarbleParser
     {
         private enum ParsingState
         {
@@ -22,20 +22,20 @@ namespace Divverence.MarbleTesting
             var moments = ParseSequence(sequence, out timeOffset);
             if (!timeOffset.HasValue || timeOffset.Value == 0)
                 return moments;
-            return moments.Select(m => new Moment(m.Time + timeOffset.Value, m.Marbles, m.IsOrderedGroup));
+            return moments.Select(m => m.TimeShiftedClone(timeOffset.Value));
         }
 
         private static IEnumerable<Moment> ParseSequence(string sequence, out int? timeOffset)
         {
             var retVal = new List<Moment>();
             var time = 0;
-            int groupTime = 0;
+            var groupTime = 0;
             timeOffset = null;
             List<string> groupMarbles = null;
             List<string> unorderedGroupMarbles = null;
             var parsingState = ParsingState.NotInGroup;
-            int marbleTime = 0;
-            StringBuilder marbleBuilder = new StringBuilder();
+            var marbleTime = 0;
+            var marbleBuilder = new StringBuilder();
             foreach (var character in sequence.Trim())
             {
                 if (parsingState == ParsingState.NotInGroup)
@@ -45,14 +45,14 @@ namespace Divverence.MarbleTesting
                         case ' ':
                         case '-':
                             FlushMarble(marbleBuilder, retVal, marbleTime, time);
-                            retVal.Add(new Moment(time));
+                            retVal.Add(Moment.Empty(time));
                             break;
                         case '^':
                             FlushMarble(marbleBuilder, retVal, marbleTime, time);
                             if (timeOffset.HasValue)
                                 throw new ArgumentException("Only one ^ character allowed", nameof(sequence));
                             timeOffset = -time;
-                            retVal.Add(new Moment(time, character.ToString()));
+                            retVal.Add(Moment.Single(time, character.ToString()));
                             break;
                         case '(':
                             FlushMarble(marbleBuilder, retVal, marbleTime, time);
@@ -79,7 +79,6 @@ namespace Divverence.MarbleTesting
                             GrowMarble(marbleBuilder, ref marbleTime, time, character);
                             break;
                     }
-
                 }
                 else if (parsingState == ParsingState.InOrderedGroup)
                 {
@@ -106,7 +105,7 @@ namespace Divverence.MarbleTesting
                             {
                                 throw new ArgumentException("Only groups with multiple marbles are allowed", nameof(sequence));
                             }
-                            retVal.Add(new Moment(groupTime, groupMarbles.ToArray()));
+                            retVal.Add(Moment.OrderedGroup(groupTime, groupMarbles.ToArray()));
                             groupMarbles = null;
                             parsingState = ParsingState.NotInGroup;
                             AddEmptyMoments(retVal, time + 1);
@@ -115,7 +114,6 @@ namespace Divverence.MarbleTesting
                             GrowMarble(marbleBuilder, ref marbleTime, groupTime, character);
                             break;
                     }
-
                 }
                 else if (parsingState == ParsingState.InUnorderedGroup)
                 {
@@ -140,7 +138,7 @@ namespace Divverence.MarbleTesting
                             {
                                 throw new ArgumentException("Only groups with multiple marbles are allowed", nameof(sequence));
                             }
-                            retVal.Add(new Moment(groupTime, unorderedGroupMarbles.ToArray(), false));
+                            retVal.Add(Moment.UnorderedGroup(groupTime, unorderedGroupMarbles.ToArray()));
                             unorderedGroupMarbles = null;
                             parsingState = ParsingState.NotInGroup;
                             AddEmptyMoments(retVal, time + 1);
@@ -189,7 +187,7 @@ namespace Divverence.MarbleTesting
             var marble = marbleBuilder.ToString();
             marbleBuilder.Clear();
 
-            retVal.Add(new Moment(marbleTime, marble));
+            retVal.Add(Moment.Single(marbleTime, marble));
 
             AddEmptyMoments(retVal, time);
         }
@@ -197,7 +195,7 @@ namespace Divverence.MarbleTesting
         private static void AddEmptyMoments(List<Moment> retVal, int time)
         {
             for (int emptyTime = retVal.Last().Time + 1; emptyTime < time; emptyTime++)
-                retVal.Add(new Moment(emptyTime));
+                retVal.Add(Moment.Empty(emptyTime));
         }
     }
 }

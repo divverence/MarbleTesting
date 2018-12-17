@@ -1,7 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.TestKit;
+using System;
+using System.Threading.Tasks;
 
 namespace Divverence.MarbleTesting.Akka.Async
 {
