@@ -12,15 +12,17 @@ namespace Divverence.MarbleTesting.Akka
             this MarbleTest marbleTest,
             string sequence,
             IActorRef toWhom,
-            Func<string, object> whatToSend) =>
-                marbleTest.WhenTelling(sequence, toWhom, marble => Task.FromResult(whatToSend(marble)));
+            Func<string, object> whatToSend,
+            IActorRef sender = null) =>
+                marbleTest.WhenTelling(sequence, toWhom, marble => Task.FromResult(whatToSend(marble)), sender);
 
         public static void WhenTelling<T>(
             this MarbleTest marbleTest,
             string sequence,
             IActorRef toWhom,
-            Func<string, Task<T>> whatToSend) =>
-                marbleTest.WhenDoing(sequence, async marble => toWhom.Tell(await whatToSend(marble)));
+            Func<string, Task<T>> whatToSend,
+            IActorRef sender = null) =>
+                marbleTest.WhenDoing(sequence, async marble => toWhom.Tell(await whatToSend(marble), sender));
 
         public static void ExpectMsgs<T>(
             this MarbleTest marbleTest,
