@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- BUILD -->
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;net452</TargetFrameworks>
@@ -9,12 +9,9 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <!-- *REF FRAMEWORK* -->
-  <ItemGroup>
-  </ItemGroup>
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
-    <PackageReference Include="Akka.TestKit.Xunit2" Version="1.3.2" />
+    <PackageReference Include="Akka.TestKit.Xunit2" Version="1.3.12" />
   </ItemGroup>
   <!-- *REF PROJECTS* -->
   <ItemGroup>

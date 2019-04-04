@@ -13,6 +13,11 @@ Change log entries should be formulated in the imperative present tense.
 
 ## Unreleased
 
+## [1.1.0] - 2019-04-04
+
+### Changed
+
+* Add optional sender `IActorRef` parameter to `WhenTelling` methods of `MarbleTestExtensionsForAkka`.
 
 ## [1.0.0] - 2018-12-14
 

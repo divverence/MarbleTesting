@@ -5,23 +5,23 @@ namespace Divverence.MarbleTesting.Tests
     public class ErrorMessageHelperTest
     {
         [Theory]
-        [InlineData(" -x-", 0, 
+        [InlineData(" -x-", 0,
             @"
   -x-
   ↑")]
-        [InlineData("-x-", 0, 
+        [InlineData("-x-", 0,
             @"
   -x-
   ↑")]
-        [InlineData("-x-", 1, 
+        [InlineData("-x-", 1,
             @"
   -x-
    ↑")]
-        [InlineData("-x-", 2, 
+        [InlineData("-x-", 2,
             @"
   -x-
     ↑")]
-        [InlineData("   -x-", 2, 
+        [InlineData("   -x-", 2,
             @"
   -x-
     ↑")]
