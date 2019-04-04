@@ -1,19 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- BUILD -->
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <IsPackable>true</IsPackable>
-    <RelativePublishBinDir>bin</RelativePublishBinDir>
   </PropertyGroup>
   <!-- *SPECIFICS* -->
   <PropertyGroup>
     <Description>Divverence.MarbleTesting Core Library</Description>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <!-- *REF FRAMEWORK* -->
-  <ItemGroup>
-  </ItemGroup>
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.5.4" />

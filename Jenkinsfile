@@ -2,6 +2,11 @@ pipeline {
     agent any
 
     stages {
+        stage('Prune local only tags') {
+            steps {
+                bat 'git fetch --prune origin "+refs/tags/*:refs/tags/*"'
+            }
+        }
         stage('Submodules') {
             steps {
                 // ToDo: if submodule out-of-date, delete build\packages dir!
