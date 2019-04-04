@@ -12,8 +12,8 @@
   </PropertyGroup>
   <!-- *REF NUGET PACKAGES* -->
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.5.4" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
+    <PackageReference Include="FSharp.Core" Version="4.6.2" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <!-- *REF PROJECTS* -->
