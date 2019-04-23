@@ -13,6 +13,12 @@ Change log entries should be formulated in the imperative present tense.
 
 ## Unreleased
 
+### Changed
+
+* Add constructor to `AsyncTestKitHelper` that only requires the system idle and active `Func` parameters.
+* Reduce visibility of `IWaitForIdleOrActive`.
+* Remove `IdleOrActive` property from `AsyncTestKitHelper`.
+
 ## [1.1.0] - 2019-04-04
 
 ### Changed

@@ -19,8 +19,6 @@
     <ProjectReference Include="..\Divverence.MarbleTesting\Divverence.MarbleTesting.csproj" />
   </ItemGroup>
   <!-- *EMBEDDED RESOURCES* -->
-  <ItemGroup>
-  </ItemGroup>
   <!-- EMBED SOURCES -->
   <ItemGroup>
     <EmbeddedFiles Include="@(Compile)" />

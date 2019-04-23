@@ -14,32 +14,48 @@ namespace Divverence.MarbleTesting.Akka.Async
     public class AsyncTestKitHelper
     {
         private readonly TestKitBase _akkaTestKit;
+        private readonly Func<Task> _systemIdle;
+        private readonly Func<Task> _systemActive;
 
-        public AsyncTestKitHelper(TestKitBase akkaTestKit)
+        public AsyncTestKitHelper(TestKitBase akkaTestKit) : this(akkaTestKit, MultiDispatcherAwaiter.CreateFromActorSystem(akkaTestKit.Sys))
+        {
+        }
+
+        private AsyncTestKitHelper(
+            TestKitBase akkaTestKit,
+            IWaitForIdleOrActive idleOrActive) :
+                this(
+                    akkaTestKit,
+                    idleOrActive.Idle,
+                    idleOrActive.Active)
+        { }
+
+        public AsyncTestKitHelper(
+            TestKitBase akkaTestKit,
+            Func<Task> systemIdle,
+            Func<Task> systemActive)
         {
             _akkaTestKit = akkaTestKit;
-
+            _systemIdle = systemIdle;
+            _systemActive = systemActive;
             var actorSystem = akkaTestKit.Sys;
-            IdleOrActive = MultiDispatcherAwaiter.CreateFromActorSystem(actorSystem);
             TestScheduler = actorSystem.Scheduler as TestScheduler;
         }
 
         #region Dispatcher
-
-        public IWaitForIdleOrActive IdleOrActive { get; }
 
         /// <summary>
         /// Await the returned Task in order to wait for the ActorSystem to become Idle - no more messages being processed or queued in any mailboxes.
         /// Note that there can still be Stashed messages and Scheduled messages.
         /// Note that even ReceiveAsync handlers must complete before the system is regarded as Idle.
         /// </summary>
-        public Task SystemIdle => IdleOrActive.Idle();
+        public Task SystemIdle => _systemIdle();
 
         /// <summary>
         /// Await the returned Task in order to wait for the ActorSystem to become Active. Needed only when an asynchronous action should active the system.
         /// Not needed when performing a Tell or Ask, or when FastForwarding the test scheduler
         /// </summary>
-        public Task SystemActive => IdleOrActive.Active();
+        public Task SystemActive => _systemActive();
 
         /// <summary>
         /// Block the thread until the ActorSystem is idle
