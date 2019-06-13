@@ -56,6 +56,13 @@ namespace Divverence.MarbleTesting.Tests
                 null, "a", null);
 
         [Fact]
+        public void ExpectShouldHandleUnorderedGroupsWithDuplicateEvents() =>
+            AssertDiagnosedFailure(
+                expectMessageToContain: "its assertion was not satisfied",
+                sequence: "-<a b>-",
+                null, "a", "a", null);
+
+        [Fact]
         public void ExpectShouldHandleOrderedGroupsWithNonMatchingSecond() =>
             AssertDiagnosedFailure(
                 expectMessageToContain: "its assertion was not satisfied",
