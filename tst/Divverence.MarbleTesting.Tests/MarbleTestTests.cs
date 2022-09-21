@@ -148,14 +148,14 @@ namespace Divverence.MarbleTesting.Tests
         public void FailingAssertShouldFailRun()
         {
             _marbleTest.Assert("a", _ => true.Should().BeFalse());
-            RunMableTest.Should().Throw<Exception>();
+            RunMableTest.Should().ThrowAsync<Exception>();
         }
 
         [Fact]
         public void PassingAssertShouldPassRun()
         {
             _marbleTest.Assert("a", _ => { });
-            RunMableTest.Should().NotThrow<Exception>();
+            RunMableTest.Should().NotThrowAsync<Exception>();
         }
 
         private void ExpectAtLeastFailure(string sequence, params string[] producedEvents)
@@ -163,7 +163,7 @@ namespace Divverence.MarbleTesting.Tests
             ExpectAtLeast(
                 sequence,
                 producedEvents);
-            RunMableTest.Should().Throw<Exception>();
+            RunMableTest.Should().ThrowAsync<Exception>();
         }
 
         private void ExpectAtLeastSuccess(string sequence, params string[] producedEvents)
@@ -171,7 +171,7 @@ namespace Divverence.MarbleTesting.Tests
             ExpectAtLeast(
                 sequence,
                 producedEvents);
-            RunMableTest.Should().NotThrow<Exception>();
+            RunMableTest.Should().NotThrowAsync<Exception>();
         }
 
         private void ExpectAtLeast(string sequence, params string[] producedEvents) =>
@@ -190,8 +190,8 @@ namespace Divverence.MarbleTesting.Tests
                 sequence,
                 eventProducer,
                 MarbleShouldEqualActual);
-            RunMableTest.Should().Throw<Exception>()
-                .And
+            RunMableTest.Should().ThrowAsync<Exception>()
+                .Result.Which
                 .Message.Should().Contain(expectMessageToContain);
         }
 
