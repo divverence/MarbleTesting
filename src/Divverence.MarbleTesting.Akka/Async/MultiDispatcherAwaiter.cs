@@ -30,6 +30,11 @@ namespace Divverence.MarbleTesting.Akka.Async
                 throw new InvalidOperationException(
                     $"akka.actor.default-dispatcher.type must be configured to \"{typeof(AwaitableTaskDispatcher).AssemblyQualifiedName}\"");
 
+            var internalDispatcher = actorSystem.Dispatchers.Lookup("akka.actor.internal-dispatcher") as AwaitableTaskDispatcher;
+            if (internalDispatcher == null)
+                throw new InvalidOperationException(
+                    $"akka.actor.internal-dispatcher.type must be configured to \"{typeof(AwaitableTaskDispatcher).AssemblyQualifiedName}\"");
+
             var testActorDispatcher =
                 actorSystem.Dispatchers.Lookup("akka.test.test-actor.dispatcher") as AwaitableTaskDispatcher;
             if (testActorDispatcher == null)
