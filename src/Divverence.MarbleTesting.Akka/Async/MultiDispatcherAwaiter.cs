@@ -41,7 +41,7 @@ namespace Divverence.MarbleTesting.Akka.Async
                 throw new InvalidOperationException(
                     $"akka.test.test-actor.dispatcher must be configured to \"{typeof(AwaitableTaskDispatcher).AssemblyQualifiedName}\"");
 
-            return new MultiDispatcherAwaiter(testDispatcher, testActorDispatcher);
+            return new MultiDispatcherAwaiter(testDispatcher, internalDispatcher, testActorDispatcher);
         }
     }
 }
