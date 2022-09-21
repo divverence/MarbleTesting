@@ -31,7 +31,7 @@ namespace Divverence.MarbleTesting.Akka.Async
         {
             while (true)
             {
-                var array = subjects.SelectMany(subject => subject._tasks).ToArray();
+                var array = subjects.SelectMany(subject => subject._tasks.ToArray()).ToArray();
                 await Task.WhenAll(array);
                 var noMoreTasksAdded = array.Length == subjects.Sum(subject => subject._tasks.Count);
                 if (noMoreTasksAdded)
