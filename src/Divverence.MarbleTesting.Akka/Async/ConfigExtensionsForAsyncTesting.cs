@@ -18,6 +18,7 @@ namespace Divverence.MarbleTesting.Akka.Async
 
         public static string AwaitableTaskDispatcherConfigHocon { get; } =
             $@"akka.actor.default-dispatcher.type = ""{typeof(AwaitableTaskDispatcherConfigurator).AssemblyQualifiedName}""
+akka.actor.internal-dispatcher.type = ""{typeof(AwaitableTaskDispatcherConfigurator).AssemblyQualifiedName}""
 akka.test.test-actor.dispatcher.type = ""{typeof(AwaitableTaskDispatcherConfigurator).AssemblyQualifiedName}""";
 
         #endregion

@@ -13,6 +13,16 @@ Change log entries should be formulated in the imperative present tense.
 
 ## Unreleased
 
+## [1.4.41] - 2022-09-21
+
+### Changed
+
+* Add constructor to `AsyncTestKitHelper` that only requires the system idle and active `Func` parameters.
+* Reduce visibility of `IWaitForIdleOrActive`.
+* Remove `IdleOrActive` property from `AsyncTestKitHelper`.
+* Target net6.0 and netstandard2.0
+* Latest Akka packages 1.4.41
+
 ## [1.1.0] - 2019-04-04
 
 ### Changed

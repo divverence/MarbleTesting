@@ -1,5 +1,4 @@
 <Project>
-
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>embedded</DebugType>
@@ -13,12 +12,6 @@
     <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Copyright>Copyright 2015-2019 Divverence B.V.</Copyright>
-    <Authors>Divverence B.V.</Authors>
-    <PackageIconUrl>http://www.divverence.com/divverencelogo.png</PackageIconUrl>
   </PropertyGroup>
 
   <!-- PACKAGE AND VERSION CREATION -->
