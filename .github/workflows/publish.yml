@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest # the tests expect Windows line endings (\r\n)
     steps:
       - uses: actions/checkout@v4
         with:
